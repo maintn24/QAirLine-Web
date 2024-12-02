@@ -91,7 +91,7 @@ const FlightBooking: React.FC = () => {
         arriveDestinationOptions: allArriveDestinations,
     });
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: any) => {
         const { name, value } = e.target;
         setSearch((prev) => ({ ...prev, [name]: value }));
     };

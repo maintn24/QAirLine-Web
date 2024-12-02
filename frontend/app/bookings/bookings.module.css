@@ -1,7 +1,7 @@
 .container {
     margin: 2rem auto;
     max-width: 800px;
-    font-family: Arial, sans-serif;
+    font-family: "Monsterat", sans-serif;
     padding: 5rem;
     align-items: center;
 }
@@ -9,7 +9,7 @@
 .title {
     text-align: center;
     margin-bottom: 1.5rem;
-    color: #1a98d3;
+    color: var(--foreground);
 }
 
 .flightlist {
@@ -22,8 +22,8 @@
     padding: 1rem;
     margin-bottom: 1rem;
     border-radius: 5px;
-    background: #E6F4FB;
-    color: #155B80;
+    background: var(--background);
+    color: var(--foreground);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -49,8 +49,8 @@
 }
 
 .flightitem .purchasebutton {
-    background: #1a98d3;
-    color: white;
+    background: var(--foreground);
+    color: var(--background);
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 5px;
@@ -58,7 +58,7 @@
     margin: 0.5rem;
 }
 .flightitem .purchasebutton:hover {
-    background: #155B80;
+    background: #333333;
 }
 
 
@@ -68,15 +68,18 @@
 }
 
 .searchBar select, .searchBar input {
-    background: #2A8ABD;
+    background: var(--foreground);
+    color: var(--background);
     padding: 0.5rem;
-    border: 1px solid #ddd;
+    border: none;
     border-radius: 5px;
     font-size: 0.75rem;
     flex: 1;
+    margin: 0.1rem;
 }
 
-.searchBar input[type="date"] {
-    flex: 1;
+.searchBar input::placeholder {
+    color: var(--background);
 }
+
 
