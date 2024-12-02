@@ -1,0 +1,82 @@
+.container {
+    margin: 2rem auto;
+    max-width: 800px;
+    font-family: Arial, sans-serif;
+    padding: 5rem;
+    align-items: center;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #1a98d3;
+}
+
+.flightlist {
+    list-style: none;
+
+}
+
+.flightitem {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+    background: #E6F4FB;
+    color: #155B80;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flightitem:hover {
+    background: #D9EAF3;
+}
+
+.flightitem .column {
+    flex: 2;
+    text-align: center;
+}
+
+.flightitem .column:first-child {
+    flex: 3;
+    text-align: left;
+}
+
+.flightitem .column:last-child {
+    flex: 1;
+    text-align: right;
+}
+
+.flightitem .purchasebutton {
+    background: #1a98d3;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0.5rem;
+}
+.flightitem .purchasebutton:hover {
+    background: #155B80;
+}
+
+
+.searchBar {
+    display: flex;
+    margin-bottom: 1.5rem;
+}
+
+.searchBar select, .searchBar input {
+    background: #2A8ABD;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.75rem;
+    flex: 1;
+}
+
+.searchBar input[type="date"] {
+    flex: 1;
+}
+
