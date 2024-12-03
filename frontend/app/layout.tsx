@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import './UI/global.css';
 import localFont from "next/font/local";
-import Header from "./header";
+import Header from "./components/header";
 
 export const metadata: Metadata = {
   title: "QAirLine",
@@ -13,10 +13,8 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
     <html lang="en">
       <body className="w-full">
         <Header/>
-        <main>
-          {children}
-        </main>
-        
+        {children}
+        {/* <Footer/> */}
       </body>
     </html>
   );

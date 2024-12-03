@@ -1,8 +1,8 @@
 import React from "react";
 import Link from "next/link";
-import style from "./UI/Header.module.css";
+import style from "@/app/UI/Header.module.css";
 
-export default function Header ({ children }: { children?: React.ReactNode }){
+export default function Header (){
 return(
 	<header className={style.header}>
 		{/*Logo */}

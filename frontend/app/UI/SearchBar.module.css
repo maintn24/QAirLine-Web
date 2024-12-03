@@ -1,0 +1,57 @@
+/* Container bao bọc cả SearchBar và Button */
+.container{
+    display: flex;
+    justify-content: center; /* Căn giữa theo chiều ngang */
+    flex-direction: column; /* Sắp xếp theo chiều dọc */
+    align-items: center;    /* Căn giữa tất cả các phần tử con */
+}
+
+.searchbar {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 800px) {
+    .searchbar {
+        flex-direction: column; /* Change to column for small screens */
+    }
+}
+
+.searchbar select, .searchbar input {
+    background: var(--foreground);
+    color: var(--background);
+    padding: 0.5rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    margin: 0.1rem;
+    flex: 1 ;
+}
+
+.searchbar input::placeholder {
+    color: var(--background);
+}
+
+    
+.searchButton {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 10px 20px;
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+
+    width: auto;                /* Đảm bảo kích thước tự động theo nội dung */
+    flex: none;                 /* Không cho nút co giãn theo flex */
+    align-self: center;         /* Căn giữa nút nếu parent là flex */
+
+}
+
+.searchButton:hover {
+    background-color: #005fa3;
+}

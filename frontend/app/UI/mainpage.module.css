@@ -2,3 +2,47 @@
   padding: 10px;
   width: 100%;
 }
+
+.hotDes{
+  /* display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px; */
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Destinations grid */
+.destinations {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+
+.destinationCard {
+  flex: 1;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  text-align: center;
+}
+
+/* Destination text overlay */
+.destinationInfo {
+  padding: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #555;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+@media (max-width:700px) {
+  .destinations{
+    flex-direction: column;
+  }
+}
