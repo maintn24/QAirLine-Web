@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import styles from '../bookings/bookings.module.css';
+import styles from './styles/SearchBar.module.css';
 
 interface SearchProps {
     search: {

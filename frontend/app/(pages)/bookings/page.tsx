@@ -2,7 +2,7 @@
 import React, {useState, useEffect} from 'react'
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './bookings.module.css'
-import SearchBar from '../components/SearchBar'
+import SearchBar from '@/app/components/SearchBar'
 
 interface Flight {
     id: string;
