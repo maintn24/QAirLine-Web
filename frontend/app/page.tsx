@@ -2,7 +2,7 @@
 import style from "@/app/UI/Mainpage.module.css";
 import { useState } from "react";
 import "@/app/UI/global.css";
-import SearchBar from "./components/searchBar";
+import SearchBar from "./components/SearchBar";
 
 export default function Home() {
   const [search, setSearch] = useState({

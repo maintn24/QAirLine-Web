@@ -33,7 +33,7 @@ const SearchBar: React.FC<SearchProps> = ({ search, handleInputChange, handleSea
                 startDate: search.startDate,
                 arriveDate: search.arriveDate,
             }).toString();
-            router.push(`/bookings?${query}`);
+            // router.push(/bookings?${query});
         }
     };
 
@@ -92,11 +92,9 @@ const SearchBar: React.FC<SearchProps> = ({ search, handleInputChange, handleSea
                 
             </div>
             {/* Conditional rendering of button */}
-            <div className={styles.searchButtonDiv}>
-                {quickSearchBar && (
-                    <button className={styles.searchButton} onClick={handleSearch}>Search</button>
-                )}
-            </div>
+            {quickSearchBar && (
+                <button className={styles.searchButton} onClick={handleSearch}>Search</button>
+            )}
         </div>      
     );
 };
