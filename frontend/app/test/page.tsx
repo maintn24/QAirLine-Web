@@ -18,7 +18,7 @@ const TestPage = () => {
     };
 
     const handleSearch = () => {
-        // Implement search logic if needed
+        console.log(search);
     };
 
     return (

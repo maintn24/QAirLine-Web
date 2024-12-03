@@ -1,8 +1,8 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react'
 import { useRouter, useSearchParams } from 'next/navigation';
-import styles from './bookings.module.css';
-import SearchBar from '@/app/components/SearchBar';
+import styles from './bookings.module.css'
+import SearchBar from '../components/SearchBar'
 
 interface Flight {
     id: string;
@@ -112,8 +112,9 @@ const FlightBooking: React.FC = () => {
     };
 
     useEffect(() => {
-        handleSearch();
-    }, [search.startDestination, search.arriveDestination, search.startDate, search.arriveDate]);
+        // Clear search params from URL
+        router.replace('/bookings');
+    }, []);
 
     return (
         <div className={styles.container}>
