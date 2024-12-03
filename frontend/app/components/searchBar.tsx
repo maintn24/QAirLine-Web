@@ -1,4 +1,5 @@
 'use client'
+import React from 'react';
 import "@/app/UI/global.css";
 import styles from '@/app/UI/SearchBar.module.css';
 import { useRouter } from 'next/navigation';
@@ -28,12 +29,12 @@ const SearchBar: React.FC<SearchProps> = ({ search, handleInputChange, handleSea
         if (quickSearchBar) {
             // Chuyển hướng với query params
             const query = new URLSearchParams({
-                startDestination: search.startDestination,
-                arriveDestination: search.arriveDestination,
-                startDate: search.startDate,
-                arriveDate: search.arriveDate,
+                startDestination: search.startDestination || '',
+                arriveDestination: search.arriveDestination || '',
+                startDate: search.startDate || '',
+                arriveDate: search.arriveDate || '',
             }).toString();
-            // router.push(/bookings?${query});
+            router.push(`/bookings?${query}`);
         }
     };
 
@@ -93,7 +94,7 @@ const SearchBar: React.FC<SearchProps> = ({ search, handleInputChange, handleSea
             </div>
             {/* Conditional rendering of button */}
             {quickSearchBar && (
-                <button className={styles.searchButton} onClick={handleSearch}>Search</button>
+                <button className={styles.searchButton} onClick={executeSearch}>Search</button>
             )}
         </div>      
     );
