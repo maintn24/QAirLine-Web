@@ -78,7 +78,6 @@ const flights: Flight[] = [
     }
 ];
 
-
 const FlightBooking: React.FC = () => {
     const allStartDestinations = [...new Set(flights.map((flight) => flight.startDestination))];
     const allArriveDestinations = [...new Set(flights.map((flight) => flight.arriveDestination))];
@@ -90,28 +89,39 @@ const FlightBooking: React.FC = () => {
         startDestinationOptions: allStartDestinations,
         arriveDestinationOptions: allArriveDestinations,
     });
+    const [filteredFlights, setFilteredFlights] = useState<Flight[]>(flights);
 
     const handleInputChange = (e: any) => {
         const { name, value } = e.target;
         setSearch((prev) => ({ ...prev, [name]: value }));
     };
 
-    const filteredFlights = flights.filter(
-        (flight) =>
-            (!search.startDestination || flight.startDestination.toLowerCase().includes(search.startDestination.toLowerCase())) &&
-            (!search.arriveDestination || flight.arriveDestination.toLowerCase().includes(search.arriveDestination.toLowerCase())) &&
-            (!search.startDate || flight.startDate.includes(search.startDate)) &&
-            (!search.arriveDate|| flight.arriveDate.includes(search.arriveDate))
-    );
+    const handleKeyDown = (e: any) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
+    const handleSearch = () => {
+        const filtered = flights.filter(
+            (flight) =>
+                (!search.startDestination || flight.startDestination.toLowerCase().includes(search.startDestination.toLowerCase())) &&
+                (!search.arriveDestination || flight.arriveDestination.toLowerCase().includes(search.arriveDestination.toLowerCase())) &&
+                (!search.startDate || flight.startDate.includes(search.startDate)) &&
+                (!search.arriveDate || flight.arriveDate.includes(search.arriveDate))
+        );
+        setFilteredFlights(filtered);
+    };
 
     return (
         <div className={styles.container}>
             <h1 className={styles.title}>Flight Booking</h1>
-            <div className={styles.searchBar}>
+            <div className={styles.searchbar}>
                 <select
                     name="startDestination"
                     value={search.startDestination}
                     onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
                 >
                     <option value="">Start Destination</option>
                     {search.startDestinationOptions.map((option) => (
@@ -124,6 +134,7 @@ const FlightBooking: React.FC = () => {
                     name="arriveDestination"
                     value={search.arriveDestination}
                     onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
                 >
                     <option value="">Arrive Destination</option>
                     {search.arriveDestinationOptions.map((option) => (
@@ -138,6 +149,7 @@ const FlightBooking: React.FC = () => {
                     placeholder="Start Date"
                     value={search.startDate}
                     onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
                 />
                 <input
                     type="text"
@@ -145,8 +157,10 @@ const FlightBooking: React.FC = () => {
                     placeholder="Arrive Date"
                     value={search.arriveDate}
                     onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
                 />
             </div>
+
             <ul className={styles.flightlist}>
                 {filteredFlights.map((flight) => (
                     <li key={flight.id} className={styles.flightitem}>
@@ -177,5 +191,4 @@ const FlightBooking: React.FC = () => {
         </div>
     );
 };
-
 export default FlightBooking;
