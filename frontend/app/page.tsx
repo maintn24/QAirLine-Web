@@ -4,6 +4,7 @@ import { useState } from "react";
 import "@/app/UI/global.css";
 import SearchBar from "./components/SearchBar";
 
+
 export default function Home() {
   const [search, setSearch] = useState({
     startDestination: '',
