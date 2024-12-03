@@ -1,6 +1,8 @@
 'use client'
-import React, {useState} from 'react'
-import styles from './bookings.module.css'
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import styles from './bookings.module.css';
+import SearchBar from '@/app/components/SearchBar';
 
 interface Flight {
     id: string;
@@ -79,13 +81,15 @@ const flights: Flight[] = [
 ];
 
 const FlightBooking: React.FC = () => {
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const allStartDestinations = [...new Set(flights.map((flight) => flight.startDestination))];
     const allArriveDestinations = [...new Set(flights.map((flight) => flight.arriveDestination))];
     const [search, setSearch] = useState({
-        startDestination: '',
-        arriveDestination: '',
-        startDate: '',
-        arriveDate: '',
+        startDestination: searchParams.get('startDestination') || '',
+        arriveDestination: searchParams.get('arriveDestination') || '',
+        startDate: searchParams.get('startDate') || '',
+        arriveDate: searchParams.get('arriveDate') || '',
         startDestinationOptions: allStartDestinations,
         arriveDestinationOptions: allArriveDestinations,
     });
@@ -94,12 +98,6 @@ const FlightBooking: React.FC = () => {
     const handleInputChange = (e: any) => {
         const { name, value } = e.target;
         setSearch((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const handleKeyDown = (e: any) => {
-        if (e.key === 'Enter') {
-            handleSearch();
-        }
     };
 
     const handleSearch = () => {
@@ -113,54 +111,19 @@ const FlightBooking: React.FC = () => {
         setFilteredFlights(filtered);
     };
 
+    useEffect(() => {
+        handleSearch();
+    }, [search.startDestination, search.arriveDestination, search.startDate, search.arriveDate]);
+
     return (
         <div className={styles.container}>
             <h1 className={styles.title}>Flight Booking</h1>
-            <div className={styles.searchbar}>
-                <select
-                    name="startDestination"
-                    value={search.startDestination}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                >
-                    <option value="">Start Destination</option>
-                    {search.startDestinationOptions.map((option) => (
-                        <option key={option} value={option}>
-                            {option}
-                        </option>
-                    ))}
-                </select>
-                <select
-                    name="arriveDestination"
-                    value={search.arriveDestination}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                >
-                    <option value="">Arrive Destination</option>
-                    {search.arriveDestinationOptions.map((option) => (
-                        <option key={option} value={option}>
-                            {option}
-                        </option>
-                    ))}
-                </select>
-                <input
-                    type="text"
-                    name="startDate"
-                    placeholder="Start Date"
-                    value={search.startDate}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                />
-                <input
-                    type="text"
-                    name="arriveDate"
-                    placeholder="Arrive Date"
-                    value={search.arriveDate}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                />
-            </div>
-
+            <SearchBar
+                search={search}
+                handleInputChange={handleInputChange}
+                handleSearch={handleSearch}
+                quickSearchBar={false}
+            />
             <ul className={styles.flightlist}>
                 {filteredFlights.map((flight) => (
                     <li key={flight.id} className={styles.flightitem}>
@@ -191,4 +154,5 @@ const FlightBooking: React.FC = () => {
         </div>
     );
 };
+
 export default FlightBooking;
