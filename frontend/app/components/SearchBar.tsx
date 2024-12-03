@@ -99,5 +99,4 @@ const SearchBar: React.FC<SearchProps> = ({ search, handleInputChange, handleSea
         </div>      
     );
 };
-
 export default SearchBar;

@@ -1,5 +1,5 @@
 'use client'
-import style from "@/app/UI/Mainpage.module.css";
+import style from "@/app/UI/mainpage.module.css";
 import { useState } from "react";
 import "@/app/UI/global.css";
 import SearchBar from "./components/SearchBar";
