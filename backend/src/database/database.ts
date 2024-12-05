@@ -1,8 +1,6 @@
-// models/db.ts
+
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
-
-// Load biến môi trường từ file .env
 dotenv.config();
 
 // Cấu hình kết nối MySQL
@@ -19,7 +17,7 @@ connection.connect((err) => {
     console.error('Error connecting to MySQL:', err.stack);
     return;
   }
-  console.log('Connected to MySQL successful');
+  console.log('Connected to MySQL successfully');
 });
 
 export default connection;
