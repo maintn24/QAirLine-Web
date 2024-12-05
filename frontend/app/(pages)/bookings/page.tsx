@@ -1,7 +1,7 @@
 'use client'
 import React, {useState, useEffect} from 'react'
 import { useRouter, useSearchParams } from 'next/navigation';
-import styles from './bookings.module.css'
+import style from './bookings.module.css'
 import SearchBar from '@/app/components/SearchBar'
 
 interface Flight {
@@ -117,24 +117,24 @@ const FlightBooking: React.FC = () => {
     }, []);
 
     return (
-        <div className={styles.container}>
-            <h1 className={styles.title}>Flight Booking</h1>
+        <div className={style.container}>
+            <h1 className={style.title}>Flight Booking</h1>
             <SearchBar
                 search={search}
                 handleInputChange={handleInputChange}
                 handleSearch={handleSearch}
                 quickSearchBar={false}
             />
-            <ul className={styles.flightlist}>
+            <ul className={style.flightlist}>
                 {filteredFlights.map((flight) => (
-                    <li key={flight.id} className={styles.flightitem}>
-                        <div className={styles.column}>
+                    <li key={flight.id} className={style.flightitem}>
+                        <div className={style.column}>
                             <strong>{flight.startDestination}</strong> → <strong>{flight.arriveDestination}</strong>
                             <div>
                                 {flight.startDate} → {flight.arriveDate}
                             </div>
                         </div>
-                        <div className={styles.column}>
+                        <div className={style.column}>
                             <div>
                                 {flight.startTime} → {flight.arriveTime}
                             </div>
@@ -145,9 +145,9 @@ const FlightBooking: React.FC = () => {
                                 Plane: {flight.planeType}
                             </div>
                         </div>
-                        <div className={styles.column}>
-                            <button className={styles.purchasebutton}>Economy: ${flight.price}</button>
-                            <button className={styles.purchasebutton}>Business: ${flight.price}</button>
+                        <div className={style.column}>
+                            <button className={style.purchasebutton}>Economy: ${flight.price}</button>
+                            <button className={style.purchasebutton}>Business: ${flight.price}</button>
                         </div>
                     </li>
                 ))}
