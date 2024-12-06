@@ -1,6 +1,6 @@
 .container {
     margin: 2rem auto;
-    max-width: 800px;
+    max-width: 1000px;
     font-family: "Monsterat", sans-serif;
     padding: 4rem;
     align-items: center;
@@ -12,10 +12,8 @@
     color: var(--foreground);
 }
 
-
 .ticketlist {
     list-style: none;
-
 }
 
 .ticketitem {
@@ -35,18 +33,23 @@
 }
 
 .ticketitem .column {
-    flex: 2;
+    flex: 1;
     text-align: center;
 }
 
 .ticketitem .column:first-child {
-    flex: 3;
+    flex: 2;
     text-align: left;
+}
+
+.ticketitem .column:nth-child(2) {
+    flex: 1;
+    text-align: center;
 }
 
 .ticketitem .column:last-child {
     flex: 1;
-    text-align: right;
+    text-align: center;
 }
 
 .container button {
@@ -57,9 +60,16 @@
     border-radius: 5px;
     cursor: pointer;
     margin: 0.5rem;
+    width: 100px;
 }
 
+.ticketitem button:hover {
+    background: #333333;
+}
+.ticketitem .checkinbutton:hover {
+    background: green;
+}
 
-
-
-
+.ticketitem .cancelbutton:hover {
+    background: red;
+}

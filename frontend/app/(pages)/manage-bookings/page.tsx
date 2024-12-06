@@ -2,6 +2,7 @@
 import style from "./manage-bookings.module.css";
 import React, { useState } from "react";
 import "@/app/global/global.css";
+import SearchBar from "@/app/components/SearchBar";
 
 interface Ticket {
     id: string;
@@ -98,31 +99,62 @@ const TicketList: Ticket[] = [
 ];
 
 const ManageBookings = () => {
+    const [ticketList, setTicketList] = useState<Ticket[]>(TicketList);
+
+    const executeCheckin = (id: string) => {
+        setTicketList(ticketList.map(ticket =>
+            ticket.id === id ? { ...ticket, status: 'Checked-in' } : ticket
+        ));
+        alert('Check-in successful!');
+    }
+    const executeCancel = (id: string) => {
+        setTicketList(ticketList.map(ticket =>
+            ticket.id === id ? { ...ticket, status: 'Cancelled' } : ticket
+        ));
+        // Hide the cancelled ticket
+        setTicketList(ticketList.filter(ticket => ticket.id !== id));
+        alert('Booking cancelled!');
+    }
     return (
         <div className={style.container}>
-            <h1 className={style.title}>Manage Bookings</h1>
+            <h1 className={style.title}>My Booking</h1>
             <ul className={style.ticketlist}>
-                {TicketList.map((ticket) => (
-                    <li className={style.ticketitem} key={ticket.id}>
-                        <div>
-                            <div className={style.column}>
-                                <div>
-                                    {ticket.id}
-                                </div>
-                                <div>
-                                    {ticket.startDestination} to {ticket.arriveDestination}
-                                </div>
-                                <div>{ticket.startDate} {ticket.startTime} - {ticket.arriveDate} {ticket.arriveTime}</div>
+                {ticketList.map((ticket) => (
+                    <li key={ticket.id} className={style.ticketitem}>
+                        <div className={style.column}>
+                            <strong>{ticket.startDestination}</strong> → <strong>{ticket.arriveDestination}</strong>
+                            <div>
+                                {ticket.startDate} → {ticket.arriveDate}
                             </div>
-                            <div className={style.column}>
-                                <div>{ticket.duration}</div>
-                                <div>{ticket.planeType}</div>
-                                <div>{ticket.price}</div>
-                                <div>{ticket.seatType}</div>
-                                <div>{ticket.seatNumber}</div>
+                        </div>
+                        <div className={style.column}>
+                            <div>
+                                {ticket.startTime} → {ticket.arriveTime}
                             </div>
-                            <div className={style.column}>
-                                <div>{ticket.status}</div>
+                            <div>
+                                Flight duration: {ticket.duration}
+                            </div>
+                            <div>
+                                Plane: {ticket.planeType}
+                            </div>
+                        </div>
+                        <div className={style.column}>
+                            <div>
+                                Status: <strong>{ticket.status}</strong>
+                            </div>
+                            <div>
+                                Seat: {ticket.seatNumber}
+                            </div>
+                            <div>
+                                {ticket.seatType}: ${ticket.price}
+                            </div>
+                        </div>
+                        <div className={style.column}>
+                            <div>
+                                <button className={style.checkinbutton} onClick={() => executeCheckin(ticket.id)}>Check-in</button>
+                            </div>
+                            <div>
+                                <button className={style.cancelbutton} onClick={() => executeCancel(ticket.id)}>Cancel</button>
                             </div>
                         </div>
                     </li>
