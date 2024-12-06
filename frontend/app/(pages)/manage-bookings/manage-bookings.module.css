@@ -12,13 +12,11 @@
     color: var(--foreground);
 }
 
-
-.flightlist {
+.ticketlist {
     list-style: none;
-
 }
 
-.flightitem {
+.ticketitem {
     border: 1px solid #ddd;
     padding: 1rem;
     margin-bottom: 1rem;
@@ -30,23 +28,28 @@
     align-items: center;
 }
 
-.flightitem:hover {
+.ticketitem:hover {
     background: #D9EAF3;
 }
 
-.flightitem .column {
-    flex: 2;
+.ticketitem .column {
+    flex: 1;
     text-align: center;
 }
 
-.flightitem .column:first-child {
+.ticketitem .column:first-child {
     flex: 2;
     text-align: left;
 }
 
-.flightitem .column:last-child {
+.ticketitem .column:nth-child(2) {
     flex: 1;
-    text-align: right;
+    text-align: center;
+}
+
+.ticketitem .column:last-child {
+    flex: 1;
+    text-align: center;
 }
 
 .container button {
@@ -57,12 +60,16 @@
     border-radius: 5px;
     cursor: pointer;
     margin: 0.5rem;
+    width: 100px;
 }
 
-.flightitem button:hover {
+.ticketitem button:hover {
     background: #333333;
 }
+.ticketitem .checkinbutton:hover {
+    background: green;
+}
 
-
-
-
+.ticketitem .cancelbutton:hover {
+    background: red;
+}
