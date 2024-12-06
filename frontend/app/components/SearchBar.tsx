@@ -86,12 +86,12 @@ const SearchBar: React.FC<SearchProps> = ({ search, handleInputChange, handleSea
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
                 />
-                
+                {/* Conditional rendering of button */}
+                {quickSearchBar && (
+                    <button className={styles.searchButton} onClick={executeSearch}>Search</button>
+                )}
             </div>
-            {/* Conditional rendering of button */}
-            {quickSearchBar && (
-                <button className={styles.searchButton} onClick={executeSearch}>Search</button>
-            )}
+
         </div> 
     );
 };
