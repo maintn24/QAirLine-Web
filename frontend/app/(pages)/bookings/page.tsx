@@ -146,8 +146,8 @@ const FlightBooking: React.FC = () => {
                             </div>
                         </div>
                         <div className={style.column}>
-                            <button className={style.purchasebutton}>Economy: ${flight.price}</button>
-                            <button className={style.purchasebutton}>Business: ${flight.price}</button>
+                            <button>Economy<br />${flight.price}</button>
+                            <button>Business<br />${flight.price}</button>
                         </div>
                     </li>
                 ))}

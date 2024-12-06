@@ -1,6 +1,6 @@
 .container {
     margin: 2rem auto;
-    max-width: 800px;
+    max-width: 1000px;
     font-family: "Monsterat", sans-serif;
     padding: 4rem;
     align-items: center;
@@ -40,7 +40,7 @@
 }
 
 .flightitem .column:first-child {
-    flex: 3;
+    flex: 2;
     text-align: left;
 }
 
@@ -59,7 +59,7 @@
     margin: 0.5rem;
 }
 
-.flightitem .purchasebutton:hover {
+.flightitem button:hover {
     background: #333333;
 }
 
