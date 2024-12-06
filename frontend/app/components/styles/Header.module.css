@@ -22,8 +22,8 @@
 /* Container */
 .container{
 	display: flex;
-	flex-grow: 1; 
-	flex-direction: column;  
+	flex-grow: 1;
+	flex-direction: column;
 	justify-content: space-between;
 	padding-bottom: 15px;
 	padding-left: 10px;
