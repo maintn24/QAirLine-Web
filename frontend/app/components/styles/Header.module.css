@@ -1,22 +1,33 @@
 /* General header styling */
 .header {
-	padding: 5px;
-	border: 2px solid black;
+	padding-top: 20px;
+	background: var(--background);
 	display: flex;
+	justify-content: center;
+	width: 100%;
+	font-size: 17px;
+}
+
+.wrapper {
+	display: flex;
+	flex-direction: row;
 	justify-content: space-between;
-	/* align-items: flex-start; */
+	align-items: center;
+	width: auto;
 }
 
 /* Logo styling */
 
-.logo{
-	padding: 5px;
-	max-height: 130px;
+.wrapper .logo {
+	position: relative;
+	padding-bottom: 15px;
 }
 
-.logo img {
-	object-fit: contain;
-	max-width: 200px;
+.wrapper .logo img {
+	height: 50px;
+	width: auto;
+	cursor: pointer;
+
 }
 
 /* Container */
@@ -30,76 +41,57 @@
 }
 
 
-/* Welcome text */
-.welcome {
-	padding: 10px;
-	margin-bottom: 10px;
-	text-align: center;
-	font-size: 18px;
-	color: #666;
-	border: 2px black solid;
-	background-color: antiquewhite;;
-}
 
 /* Navigation bar styling */
 .nav {
 	width: 100%;
 	display: flex;
-	/* padding: 10px; */
-	padding-top: 10px;
-	padding-bottom: 10px;
-	background-color: #b29494;
-	border: 2px solid black;
 }
 
 .navList {
 	flex: 1;
 	list-style: none;
 	display: flex;
-	justify-content: center;
-	gap: 30px;
+	justify-content: left;
 	margin: 0;
 	padding: 0;
 }
 
 .navList li {
-	padding: 5px 10px;
-	font-size: 16px;
-	text-align: center;
-	border: 2px solid black;
+	cursor: pointer;
+	padding: 0.5rem 1rem;
+	border-radius: 5px;
+	color: var(--foreground);
+	font-family: "Montserrat", sans-serif;
 }
 
 .navList li:hover {
-	background-color: #0077cc;
+	background-color: var(--foreground);
 	cursor: pointer;
+	color: var(--background);
+	transition: background-color 0.5s ease, color 0.5s ease; /* Add transition for smooth effect */
+}
+
+.navList .active {
+	background-color: #D9EAF3;
+	font-weight: bold;
 }
 
 /* Mobile responsiveness */
-@media (max-width: 768px) {
-	.logo-text {
-		font-size: 20px;
+@media (max-width: 800px) {
+	.logo img {
+		height: auto;
+		width: auto;
+		margin-left: 0;
 	}
 
-	.nav-list {
-		gap: 20px;
+	.navList {
+		gap: 5px;
 	}
 
-	.nav-list li {
-		font-size: 14px;
+	.navList li {
+		padding: 0.5rem;
 	}
 }
 
-@media (max-width: 480px) {
-	.logo-text {
-		font-size: 18px;
-	}
 
-	.nav-list {
-		gap: 15px;
-		flex-direction: column;
-	}
-
-	.nav-list li {
-		font-size: 16px;
-	}
-}
