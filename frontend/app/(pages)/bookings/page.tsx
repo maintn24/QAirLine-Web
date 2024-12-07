@@ -1,153 +1,130 @@
 'use client'
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import style from './bookings.module.css'
-import SearchBar from '@/app/components/SearchBar'
+import {format} from 'date-fns';
+import style from './bookings.module.css';
+import SearchBar from '@/app/components/SearchBar';
 
 interface Flight {
-    id: string;
-    startTime: string;
-    arriveTime: string;
-    startDate: string;
-    arriveDate: string;
-    startDestination: string;
-    arriveDestination: string;
-    duration: string;
-    planeType: string;
-    price: number;
+    FlightID: number;
+    AircraftTypeID: number;
+    Departure: string;
+    Arrival: string;
+    DepartureTime: string;
+    ArrivalTime: string;
+    Price: number;
+    SeatsAvailable: number;
+    Status: 'on-time' | 'delayed';
 }
-
-const flights: Flight[] = [
-    {
-        id: '1',
-        startTime: '08:00 AM',
-        arriveTime: '10:00 AM',
-        startDate: '2024-12-15',
-        arriveDate: '2024-12-15',
-        startDestination: 'New York (JFK)',
-        arriveDestination: 'Los Angeles (LAX)',
-        duration: '5h 30m',
-        planeType: 'Boeing 737',
-        price: 300,
-    },
-    {
-        id: '2',
-        startTime: '01:00 PM',
-        arriveTime: '04:30 PM',
-        startDate: '2024-12-16',
-        arriveDate: '2024-12-16',
-        startDestination: 'Chicago (ORD)',
-        arriveDestination: 'Miami (MIA)',
-        duration: '3h 30m',
-        planeType: 'Airbus A320',
-        price: 200,
-    },
-    {
-        id: '3',
-        startTime: '06:00 PM',
-        arriveTime: '08:45 PM',
-        startDate: '2024-12-17',
-        arriveDate: '2024-12-17',
-        startDestination: 'San Francisco (SFO)',
-        arriveDestination: 'Seattle (SEA)',
-        duration: '2h 45m',
-        planeType: 'Boeing 757',
-        price: 150,
-    },
-    {
-        id: '4',
-        startTime: '06:00 PM',
-        arriveTime: '08:45 PM',
-        startDate: '2024-12-18',
-        arriveDate: '2024-12-18',
-        startDestination: 'San Francisco (SFO)',
-        arriveDestination: 'Seattle (SEA)',
-        duration: '2h 45m',
-        planeType: 'Boeing 757',
-        price: 150,
-    },
-    {
-        id: '5',
-        startTime: '06:00 PM',
-        arriveTime: '08:45 PM',
-        startDate: '2024-12-15',
-        arriveDate: '2024-12-15',
-        startDestination: 'San Francisco (SFO)',
-        arriveDestination: 'Seattle (SEA)',
-        duration: '2h 45m',
-        planeType: 'Boeing 757',
-        price: 150,
-    }
-];
 
 const FlightBooking: React.FC = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const allStartDestinations = [...new Set(flights.map((flight) => flight.startDestination))];
-    const allArriveDestinations = [...new Set(flights.map((flight) => flight.arriveDestination))];
+    const [flights, setFlights] = useState<Flight[]>([]);
     const [search, setSearch] = useState({
         startDestination: searchParams.get('startDestination') || '',
         arriveDestination: searchParams.get('arriveDestination') || '',
         startDate: searchParams.get('startDate') || '',
         arriveDate: searchParams.get('arriveDate') || '',
-        startDestinationOptions: allStartDestinations,
-        arriveDestinationOptions: allArriveDestinations,
+        startDestinationOptions: ['New York (JFK)', 'Chicago (ORD)', 'San Francisco (SFO)'], // Default options
+        arriveDestinationOptions: ['New York (JFK)', 'Chicago (ORD)', 'San Francisco (SFO)'],
     });
+
+    useEffect(() => {
+        const fetchFlights = async () => {
+            try {
+                const response = await fetch('http://localhost:3001/api/flights');
+                const data = await response.json();
+
+                if (response.ok && Array.isArray(data)) {
+                    setFlights(data);
+                    // Lấy danh sách các điểm đi và điểm đến từ api/flights
+                    const uniqueStartDestinations = Array.from(new Set(data.map(flights => flights.Departure)));
+                    const uniqueArriveDestinations = Array.from(new Set(data.map(flights => flights.Arrival)));
+
+                    // Cập nhật danh sách các điểm đi và điểm đến vào search
+                    setSearch(prev => ({
+                        ...prev,
+                        startDestinationOptions: uniqueStartDestinations,
+                        arriveDestinationOptions: uniqueArriveDestinations,
+                    }));
+                } else {
+                    console.error('Fetched data is not an array:', data);
+                }
+            } catch (error) {
+                console.error('Error fetching flights:', error);
+            }
+        };
+        fetchFlights();
+    }, [search]);
+
+    // Xử lý tìm kiếm khi có thay đổi search bar
+    useEffect(() => {
+        handleSearch()
+    }, [search]);
+
+
+
+    // Lọc danh sách các chuyến bay theo điều kiện tìm kiếm
     const [filteredFlights, setFilteredFlights] = useState<Flight[]>(flights);
 
-    const handleInputChange = (e: any) => {
-        const { name, value } = e.target;
-        setSearch((prev) => ({ ...prev, [name]: value }));
-    };
-
     const handleSearch = () => {
+        // Trigger the search
         const filtered = flights.filter(
             (flight) =>
-                (!search.startDestination || flight.startDestination.toLowerCase().includes(search.startDestination.toLowerCase())) &&
-                (!search.arriveDestination || flight.arriveDestination.toLowerCase().includes(search.arriveDestination.toLowerCase())) &&
-                (!search.startDate || flight.startDate.includes(search.startDate)) &&
-                (!search.arriveDate || flight.arriveDate.includes(search.arriveDate))
+                (!search.startDestination || flight.Departure.toLowerCase().includes(search.startDestination.toLowerCase())) &&
+                (!search.arriveDestination || flight.Arrival.toLowerCase().includes(search.arriveDestination.toLowerCase())) &&
+                (!search.startDate || flight.DepartureTime.includes(search.startDate)) &&
+                (!search.arriveDate || flight.ArrivalTime.includes(search.arriveDate))
         );
         setFilteredFlights(filtered);
     };
 
-    useEffect(() => {
-        // Clear search params from URL
-        router.replace('/bookings');
-    }, []);
+    const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setSearch((prev) => ({ ...prev, [name]: value }));
+    };
+
+    // Tính thời gian bay
+    const calculateFlightDuration = (departureTime: string, arrivalTime: string) => {
+        const departure = new Date(departureTime);
+        const arrival = new Date(arrivalTime);
+        const durationMs = arrival.getTime() - departure.getTime();
+        const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+        const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+        return `${durationHours}h ${durationMinutes}m`;
+    };
+
+    // Định dạng lại datetime
+    const formatedDate = (datetime: string) => {
+        return format(new Date(datetime), 'dd/MM/yyyy HH:mm');
+    };
 
     return (
         <div className={style.container}>
             <h1 className={style.title}>Flight Booking</h1>
-            <SearchBar
-                search={search}
-                handleInputChange={handleInputChange}
-                handleSearch={handleSearch}
-                quickSearchBar={false}
+            <SearchBar search={search} handleInputChange={handleInputChange} handleSearch={handleSearch}
             />
             <ul className={style.flightlist}>
                 {filteredFlights.map((flight) => (
-                    <li key={flight.id} className={style.flightitem}>
+                    <li key={flight.FlightID} className={style.flightitem}>
                         <div className={style.column}>
-                            <strong>{flight.startDestination}</strong> → <strong>{flight.arriveDestination}</strong>
+                            <strong>{flight.Departure}</strong> → <strong>{flight.Arrival}</strong>
                             <div>
-                                {flight.startDate} → {flight.arriveDate}
+                                {formatedDate(flight.DepartureTime)} → {formatedDate(flight.ArrivalTime)}
                             </div>
                         </div>
                         <div className={style.column}>
                             <div>
-                                {flight.startTime} → {flight.arriveTime}
+                                Flight duration: {calculateFlightDuration(flight.DepartureTime, flight.ArrivalTime)}
                             </div>
                             <div>
-                                Flight duration: {flight.duration}
-                            </div>
-                            <div>
-                                Plane: {flight.planeType}
+                                Plane: {flight.AircraftTypeID}
                             </div>
                         </div>
                         <div className={style.column}>
-                            <button>Economy<br />${flight.price}</button>
-                            <button>Business<br />${flight.price}</button>
+                            <button>Economy<br />${flight.Price}</button>
+                            <button>Business<br />${flight.Price}</button>
                         </div>
                     </li>
                 ))}

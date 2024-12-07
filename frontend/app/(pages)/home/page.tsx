@@ -1,6 +1,6 @@
 'use client'
 import style from "./homepage.module.css";
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import "@/app/global/global.css";
 import SearchBar from "@/app/components/SearchBar";
 
@@ -15,14 +15,35 @@ export default function Home() {
     arriveDestinationOptions: ['Los Angeles (LAX)', 'Miami (MIA)', 'Seattle (SEA)'],
   });
 
-  const handleInputChange = (e: any) => {
-      const { name, value } = e.target;
-      setSearch((prev) => ({ ...prev, [name]: value }));
-  };
+    // Lấy danh sách các điểm đi và điểm đến từ api/flights cho search bar
+    useEffect(() => {
+        const fetchLocations = async () => {
+            try {
+                const response = await fetch('http://localhost:3001/api/flights');
+                const data: { Departure: string; Arrival: string }[] = await response.json();
+                const uniqueStartDestinations = Array.from(new Set(data.map(flight => flight.Departure)));
+                const uniqueArriveDestinations = Array.from(new Set(data.map(flight => flight.Arrival)));
+                setSearch(prev => ({
+                    ...prev,
+                    startDestinationOptions: uniqueStartDestinations,
+                    arriveDestinationOptions: uniqueArriveDestinations,
+                }));
+            } catch (error) {
+                console.error('Error fetching locations:', error);
+            }
+        };
 
-  const handleSearch = () => {
-      console.log(search);
-  };
+        fetchLocations();
+    }, []);
+
+    const handleInputChange = (e: any) => {
+        const { name, value } = e.target;
+        setSearch((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleSearch = () => {
+        console.log(search);
+    };
 
   return (
       <main>
