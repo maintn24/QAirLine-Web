@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {format} from 'date-fns';
-import style from './bookings.module.css';
+import style from './search.module.css';
 import SearchBar from '@/app/components/SearchBar';
 
 interface Flight {
@@ -29,6 +29,9 @@ const FlightBooking: React.FC = () => {
         startDestinationOptions: ['New York (JFK)', 'Chicago (ORD)', 'San Francisco (SFO)'], // Default options
         arriveDestinationOptions: ['New York (JFK)', 'Chicago (ORD)', 'San Francisco (SFO)'],
     });
+
+
+
 
     useEffect(() => {
         const fetchFlights = async () => {
@@ -63,7 +66,10 @@ const FlightBooking: React.FC = () => {
         handleSearch()
     }, [search]);
 
-
+    useEffect(() => {
+        // Clear search params from URL
+        router.replace('/bookings/search');
+    }, []);
 
     // Lọc danh sách các chuyến bay theo điều kiện tìm kiếm
     const [filteredFlights, setFilteredFlights] = useState<Flight[]>(flights);
@@ -84,6 +90,10 @@ const FlightBooking: React.FC = () => {
         const { name, value } = e.target;
         setSearch((prev) => ({ ...prev, [name]: value }));
     };
+
+    const toPaymentPage = () => {
+        router.push(`/bookings/payment/`);
+    }
 
     // Tính thời gian bay
     const calculateFlightDuration = (departureTime: string, arrivalTime: string) => {
@@ -123,7 +133,7 @@ const FlightBooking: React.FC = () => {
                             </div>
                         </div>
                         <div className={style.column}>
-                            <button>Economy<br />${flight.Price}</button>
+                            <button onClick={toPaymentPage}>Economy<br />${flight.Price}</button>
                             <button>Business<br />${flight.Price}</button>
                         </div>
                     </li>

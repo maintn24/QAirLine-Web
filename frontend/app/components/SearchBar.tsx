@@ -31,7 +31,7 @@ const SearchBar: React.FC<SearchProps> = ({ search, handleInputChange, handleSea
                 startDate: search.startDate || '',
                 arriveDate: search.arriveDate || '',
             }).toString();
-            router.push(`/bookings?${query}`);
+            router.push(`/bookings/search?${query}`);
         }
         handleSearch();
     };

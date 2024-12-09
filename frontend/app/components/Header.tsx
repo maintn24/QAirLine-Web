@@ -17,7 +17,7 @@ export default function Header() {
 		router.push(`/home`);
 	};
 	const toBookFlights = () => {
-		router.push(`/bookings`);
+		router.push(`/bookings/search`);
 	};
 	const toManageBooking = () => {
 		router.push(`/manage-bookings`);
@@ -41,7 +41,7 @@ export default function Header() {
 						<ul className={style.navList}>
 							<li className={currentRoute === '/home' ? style.active : ''}
 								onClick={toHomePage}>Home</li>
-							<li className={currentRoute === '/bookings' ? style.active : ''}
+							<li className={currentRoute === '/bookings/search' ? style.active : ''}
 								onClick={toBookFlights}>Book Flights</li>
 							<li className={currentRoute === '/offers' ? style.active : ''}
 								onClick={toOffers}>Offers</li>

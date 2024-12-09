@@ -19,6 +19,10 @@
     }
 }
 
+.searchbar label {
+
+}
+
 .searchbar select, .searchbar input {
     background: var(--foreground);
     color: var(--background);
