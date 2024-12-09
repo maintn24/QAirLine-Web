@@ -1,10 +1,16 @@
 # QAirLine-Web-Development
-_Last update: 30-11-2024_
+_Last update: 9-12-2024_
 
 Member:
 - Phạm Xuân Dương (MSV: 22025518)
 - Nguyễn Thị Ngọc Mai (MSV: 22025510)
 - Trần Khánh Duy (MSV: 22025520)
+
+### GIT BRANCH
+- main
+- develop: Làm gì trên backend thì pull nhánh này
+- front-end: Làm gì trên frontend thì pull nhánh này
+- frontend/....: Nhánh con của front-end
 
 ### GIT FLOW
 *Lưu ý: Nếu muốn merge code lên develop phải thông báo lên nhóm*
