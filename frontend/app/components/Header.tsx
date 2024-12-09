@@ -1,23 +1,23 @@
 'use client'
 import React from "react";
 import { useState } from "react";
-import Link from "next/link";
+import {usePathname, useRouter} from 'next/navigation';
 import style from "./styles/Header.module.css";
-import { useRouter } from 'next/navigation';
 import SignIn_SignUp_PopUp from "@/app/components/SignIn_SignUp_PopUp";
 
-export default function Header (){
-	// Hiển thị popup khi click vào Login/Register
+export default function Header() {
 	const [isVisible, setIsVisible] = useState(false);
 	const handleLoginClick = () => {
 		setIsVisible(true);
 	};
+
 	const router = useRouter();
+	const currentRoute = usePathname()
 	const toHomePage = () => {
-		router.push(`/`);
+		router.push(`/home`);
 	};
 	const toBookFlights = () => {
-		router.push(`/bookings`);
+		router.push(`/bookings/search`);
 	};
 	const toManageBooking = () => {
 		router.push(`/manage-bookings`);
@@ -28,31 +28,33 @@ export default function Header (){
 	const toAbout = () => {
 		router.push(`/about`);
 	};
-	return(
+
+	return (
 		<header className={style.header}>
-			{/*Logo */}
-			<div className={style.logo}>
-				<img src="Image&Icon/Logo.png" style={{ cursor: 'pointer' }} alt="Cloud Airlines Logo" onClick={toHomePage}></img>
-			</div>
-			<div className={style.container}>
-				{/*Welcome, UserName*/}
-				<div className={style.welcome}>
-					Welcome to Cloud Airlines!
+			<div className={style.wrapper}>
+				<div className={style.logo}>
+					<img src={`/Logo/LogoS.png`} style={{cursor: 'pointer'}} alt="Cloud Airlines Logo"
+						 onClick={toHomePage}/>
 				</div>
-				{/*  Navigation */}
-				<nav className={style.nav}>
-					<ul className={style.navList}>
-						<li onClick={toHomePage}>Home</li>
-						<li onClick={toBookFlights}>Book Flights</li>
-						<li onClick={toOffers}>Offers</li>
-						<li onClick={toManageBooking}>Manage Booking</li>
-						<li onClick={toAbout}>About</li>
-						<li onClick={handleLoginClick}>Login| Register</li>
-					</ul>
-				</nav>
-				<SignIn_SignUp_PopUp visible={isVisible} setVisible={setIsVisible} />
+				<div className={style.container}>
+					<nav className={style.nav}>
+						<ul className={style.navList}>
+							<li className={currentRoute === '/home' ? style.active : ''}
+								onClick={toHomePage}>Home</li>
+							<li className={currentRoute === '/bookings/search' ? style.active : ''}
+								onClick={toBookFlights}>Book Flights</li>
+							<li className={currentRoute === '/offers' ? style.active : ''}
+								onClick={toOffers}>Offers</li>
+							<li className={currentRoute === '/manage-bookings' ? style.active : ''}
+								onClick={toManageBooking}>Manage Booking</li>
+							<li className={currentRoute === '/about' ? style.active : ''}
+								onClick={toAbout}>About</li>
+							<li onClick={handleLoginClick}>Login | Register</li>
+						</ul>
+					</nav>
+					<SignIn_SignUp_PopUp visible={isVisible} setVisible={setIsVisible}/>
+				</div>
 			</div>
 		</header>
-
-	)
+	);
 }

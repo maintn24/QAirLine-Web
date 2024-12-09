@@ -1,8 +1,8 @@
 .container {
-    margin: 2rem auto;
+    margin: auto;
     max-width: 1000px;
     font-family: "Monsterat", sans-serif;
-    padding: 4rem;
+    padding: 0px;
     align-items: center;
 }
 
