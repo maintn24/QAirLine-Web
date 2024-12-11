@@ -2,10 +2,9 @@ import "@/app/global/global.css";
 
 export default function Footer (){
     return(
-
-            <div className="text-gray-dark text-center border-t border-gray-lightest py-4 bg-white">
-                <div className="text-base">Copyright by "Three Monkey UET 2024". All rights reserved.
-                </div>
+        <div className="text-gray-dark text-center border-t border-gray-lightest py-4 bg-white w-full fixed bottom-0">
+            <div className="text-base">Copyright by "Three Monkey UET 2024". All rights reserved.
             </div>
+        </div>
     )
 };
