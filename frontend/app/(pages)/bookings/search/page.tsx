@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, Suspense} from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {format} from 'date-fns';
 import style from './search.module.css';
@@ -142,4 +142,10 @@ const FlightBooking: React.FC = () => {
     );
 };
 
-export default FlightBooking;
+const WrappedSearchPage = () => (
+    <Suspense fallback={<div>Loading...</div>}>
+        <FlightBooking />
+    </Suspense>
+);
+
+export default WrappedSearchPage;

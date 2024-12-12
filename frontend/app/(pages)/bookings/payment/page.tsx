@@ -1,5 +1,5 @@
 'use client'
-import React, {useEffect} from 'react';
+import React, {Suspense, useEffect} from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import style from './payment.module.css';
 
@@ -50,4 +50,10 @@ const PaymentPage = () => {
     );
 };
 
-export default PaymentPage;
+const WrappedPaymentPage = () => (
+    <Suspense fallback={<div>Loading...</div>}>
+        <PaymentPage />
+    </Suspense>
+);
+
+export default WrappedPaymentPage;

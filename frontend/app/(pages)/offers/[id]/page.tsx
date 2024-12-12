@@ -6,6 +6,7 @@
 'use client';
 import styles from '@/app/(pages)/offers/[id]/offerDetailPage.module.css';
 import { useSearchParams } from 'next/navigation';
+import {Suspense} from "react";
 
 
 const OfferDetailPage = () => { //{ offer }: { offer: { id: number; title: string; description: string } }
@@ -24,7 +25,14 @@ const OfferDetailPage = () => { //{ offer }: { offer: { id: number; title: strin
   );
 };
 
-export default OfferDetailPage;
+const WrappedOfferDetailPage = () => (
+    <Suspense fallback={<div>Loading...</div>}>
+        <OfferDetailPage />
+    </Suspense>
+);
+
+export default WrappedOfferDetailPage;
+
 // export const getStaticPaths: GetStaticPaths = async () => {
 //   // Fetch tất cả các ID của offers để tạo ra các path cho các trang offer chi tiết
 //   const offers = await fetch('https://api.example.com/offers')
