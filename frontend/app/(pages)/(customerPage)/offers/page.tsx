@@ -1,7 +1,7 @@
 // pages/offers/index.tsx
 'use client';
 import Link from 'next/link';
-import styles from "@/app/(pages)/offers/offerPage.module.css";
+import styles from "./offerPage.module.css";
 
 interface offer {
   id: number;

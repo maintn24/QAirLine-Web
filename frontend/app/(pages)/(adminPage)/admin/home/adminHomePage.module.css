@@ -1,17 +1,24 @@
-.blog-container {
-    width: 80%; /* Chiều rộng 80% */
-    margin: 2rem auto; /* Căn giữa container */
-    padding: 2rem; /* Thêm khoảng cách bên trong */
-    border: 2px solid black; /* Viền đen */
-    border-radius: 10px; /* Bo góc container */
-    background-color: #f9f9f9; /* Màu nền nhẹ nhàng */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
-  }
-  
-  .blog-container h1 {
-    font-size: 2rem; /* Chữ to */
-    font-weight: bold; /* Chữ đậm */
-    text-align: center; /* Căn giữa chữ */
-    margin: 0; /* Xóa khoảng cách mặc định */
-  }
-  
+.blogContainer {
+  display: flex;
+  justify-content: center; /* Căn ngang */
+  align-items: center; /* Căn dọc */
+  height: 60vh; /* Chiều cao bằng 60% của viewport */
+  width: 60vw; /* Chiều rộng bằng 80% của viewport */
+  margin: auto; /* Đặt container ở giữa */
+  text-align: center;
+  border: 5px solid #000; /* Viền đen 5px */
+  border-radius: 10px; /* Bo góc viền */
+  background-image: url('/AdminHomePage/airplane_background.png'); /* Đường dẫn ảnh */
+  background-size: cover; /* Ảnh phủ đầy container */
+  background-position: center; /* Căn giữa ảnh nền */
+  background-repeat: no-repeat; /* Không lặp lại ảnh */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Hiệu ứng đổ bóng */
+}
+
+
+.title {
+  font-size: 3rem; /* Kích thước chữ lớn hơn */
+  font-weight: bold; /* Tô đậm chữ */
+  color: #333; /* Màu chữ (tùy chỉnh) */
+  margin: 0; /* Loại bỏ margin mặc định */
+}
