@@ -4,7 +4,7 @@
 // trang.
 
 'use client';
-import styles from '@/app/(pages)/offers/[id]/offerDetailPage.module.css';
+import styles from '@/app/(pages)/(customerPage)/offers/[id]/offerDetailPage.module.css';
 import { useSearchParams } from 'next/navigation';
 import {Suspense} from "react";
 

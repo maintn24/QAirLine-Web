@@ -2,7 +2,7 @@
 import React from "react";
 import { useState } from "react";
 import {usePathname, useRouter} from 'next/navigation';
-import style from "./styles/Header.module.css";
+import style from "./styles/CustomerHeader.module.css";
 import SignIn_SignUp_PopUp from "@/app/components/SignIn_SignUp_PopUp";
 
 export default function Header() {
