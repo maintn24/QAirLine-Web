@@ -27,3 +27,13 @@ Member:
 7. `Git commit -m “message”`
 8. Đẩy nhánh temp lên github: `git push origin [Tên nhánh]`
 9. Pull request
+
+### chạy được backend 14/12/2024
+1
+- npm install jsonwebtoken
+- npm install @types/jsonwebtoken --save-dev
+- thêm: "esModuleInterop": true,  vào tscconfig.json
+2
+- npm install bcryptjs
+- npm install @types/bcryptjs --save-dev
+-  thêm "esModuleInterop": true, vào tscconfig.json
