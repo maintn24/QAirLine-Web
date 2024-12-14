@@ -1,0 +1,54 @@
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white; /* Nền trắng */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .table th, .table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    color: #333; /* Màu chữ */
+  }
+  
+  .table th {
+    background-color: #f4f4f4; /* Nền tiêu đề */
+    font-weight: bold;
+  }
+  
+  .table tr:hover {
+    background-color: #f1f8ff; /* Nền xanh nhạt khi hover */
+  }
+  
+  .editButton, .deleteButton {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .editButton {
+    background-color: #007bff; /* Xanh lam */
+    color: white;
+  }
+  
+  .editButton:hover {
+    background-color: #0056b3; /* Xanh lam tối */
+  }
+  
+  .deleteButton {
+    background-color: #dc3545; /* Đỏ */
+    color: white;
+    margin-left: 10px;
+  }
+  
+  .deleteButton:hover {
+    background-color: #a71d2a; /* Đỏ tối */
+  }
+  
