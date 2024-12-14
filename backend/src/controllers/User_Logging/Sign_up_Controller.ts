@@ -2,7 +2,7 @@ import mysql from 'mysql2'; // Import thư viện mysql2
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import connection from 'D:/DevWeb/QAirLine-Web-Development/backend/src/database/database'; // Import kết nối từ file database.ts
+import connection from '../../database/database'; // Import kết nối từ file database.ts
 
 export const signUp = (req: Request, res: Response) => {
   const { Name, Username, Email, Password, Role } = req.body;

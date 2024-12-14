@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import connection from 'D:/DevWeb/QAirLine-Web-Development/backend/src/database/database';  // Import kết nối từ file database.ts
+import connection from "../../database/database";  // Import kết nối từ file database.ts
 
 export const signIn = (req: Request, res: Response) => {
   const { Email, Password } = req.body;  // Đổi từ Username thành Email
