@@ -70,6 +70,14 @@
     background-color: #0ca190; /* Màu khi hover */
 }
 
+.error {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    text-align: center;
+}
+  
+
 /* Responsive: Đảm bảo form không bị quá nhỏ */
 @media (max-width: 480px) {
     .loginBox {
