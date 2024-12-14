@@ -1,0 +1,36 @@
+.container {
+    background-color: #fdf6e3; /* Màu vàng nhạt như giấy */
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 600px;
+    margin: 40px auto; /* Căn giữa nội dung */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+.postDate {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 15px;
+  font-style: italic;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+  color: #333; /* Màu chữ tiêu đề */
+}
+
+.divider {
+  border: none;
+  border-top: 2px solid #ccc; /* Dòng gạch ở giữa */
+  margin: 20px 0;
+}
+
+.description {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  text-align: justify;
+  color: #555; /* Màu chữ phần mô tả */
+}

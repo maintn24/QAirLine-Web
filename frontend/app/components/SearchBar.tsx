@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { format, parse } from 'date-fns';
 import styles from './styles/SearchBar.module.css';
 
 interface SearchProps {
@@ -21,7 +22,7 @@ const SearchBar: React.FC<SearchProps> = ({ search, handleInputChange, handleSea
 
     // Hàm xử lý query và chuyển hướng
     const executeSearch = () => {
-        handleSearch(); // Gọi hàm xử lý logic tìm kiếm
+         // Gọi hàm xử lý logic tìm
         if (quickSearchBar) {
             // Chuyển hướng với query params
             const query = new URLSearchParams({
@@ -30,8 +31,9 @@ const SearchBar: React.FC<SearchProps> = ({ search, handleInputChange, handleSea
                 startDate: search.startDate || '',
                 arriveDate: search.arriveDate || '',
             }).toString();
-            router.push(`/bookings?${query}`);
+            router.push(`/bookings/search?${query}`);
         }
+        handleSearch();
     };
     // Hàm xử lý khi nhấn phím Enter
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -71,7 +73,7 @@ const SearchBar: React.FC<SearchProps> = ({ search, handleInputChange, handleSea
                     ))}
                 </select>
                 <input
-                    type="text"
+                    type="date"
                     name="startDate"
                     placeholder="Start Date"
                     value={search.startDate}
@@ -79,20 +81,18 @@ const SearchBar: React.FC<SearchProps> = ({ search, handleInputChange, handleSea
                     onKeyDown={handleKeyDown}
                 />
                 <input
-                    type="text"
+                    type="date"
                     name="arriveDate"
                     placeholder="Arrive Date"
                     value={search.arriveDate}
                     onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
                 />
-                
-            </div>
-            {/* Conditional rendering of button */}
-            {quickSearchBar && (
+                {/* Conditional rendering of button */}
                 <button className={styles.searchButton} onClick={executeSearch}>Search</button>
-            )}
-        </div> 
+            </div>
+
+        </div>
     );
 };
 

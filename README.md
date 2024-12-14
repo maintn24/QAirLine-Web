@@ -12,6 +12,12 @@ Member:
 - front-end: Làm gì trên frontend thì pull nhánh này
 - frontend/....: Nhánh con của front-end
 
+### GIT BRANCH
+- main
+- develop: Làm gì trên backend thì pull nhánh này
+- front-end: Làm gì trên frontend thì pull nhánh này
+- frontend/....: Nhánh con của front-end
+
 ### GIT FLOW
 *Lưu ý: Nếu muốn merge code lên develop phải thông báo lên nhóm*
 *Nhớ chuyển về root folder để commit code*
@@ -37,3 +43,4 @@ Member:
 - npm install bcryptjs
 - npm install @types/bcryptjs --save-dev
 -  thêm "esModuleInterop": true, vào tscconfig.json
+

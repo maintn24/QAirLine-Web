@@ -1,8 +1,8 @@
 .container {
-    margin: 2rem auto;
+    margin: auto;
     max-width: 1000px;
     font-family: "Monsterat", sans-serif;
-    padding: 4rem;
+    padding: 0px;
     align-items: center;
 }
 
@@ -12,11 +12,13 @@
     color: var(--foreground);
 }
 
-.ticketlist {
+
+.flightlist {
     list-style: none;
+
 }
 
-.ticketitem {
+.flightitem {
     border: 1px solid #ddd;
     padding: 1rem;
     margin-bottom: 1rem;
@@ -28,48 +30,39 @@
     align-items: center;
 }
 
-.ticketitem:hover {
+.flightitem:hover {
     background: #D9EAF3;
 }
 
-.ticketitem .column {
-    flex: 1;
-    text-align: center;
-}
-
-.ticketitem .column:first-child {
+.flightitem .column {
     flex: 2;
     text-align: left;
 }
 
-.ticketitem .column:nth-child(2) {
-    flex: 1;
-    text-align: center;
+.flightitem .column:first-child {
+    flex: 3;
+    text-align: left;
 }
 
-.ticketitem .column:last-child {
-    flex: 1;
-    text-align: center;
+.flightitem .column:last-child {
+    flex: 2;
+    text-align: right;
 }
 
 .container button {
     background: var(--foreground);
     color: var(--background);
     border: none;
-    padding: 0.5rem 1rem;
+    padding: 1rem 1rem;
     border-radius: 5px;
     cursor: pointer;
     margin: 0.5rem;
-    width: 100px;
 }
 
-.ticketitem button:hover {
+.flightitem button:hover {
     background: #333333;
 }
-.ticketitem .checkinbutton:hover {
-    background: green;
-}
 
-.ticketitem .cancelbutton:hover {
-    background: red;
-}
+
+
+

@@ -165,7 +165,7 @@ export const cancelBooking = (req: Request, res: Response): void => {
   const bookingQuery = 'SELECT * FROM Bookings WHERE BookingID = ? AND UserID = ?';
   connection.query(bookingQuery, [bookingID, userID], (err, results) => {
     if (err) {
-      console.error('Error querying bookings:', err);
+      console.error('Error querying booking:', err);
       res.status(500).json({ message: 'Internal server error' });
       return;
     }
@@ -249,7 +249,7 @@ export const getUserFlights = (req: Request, res: Response): void => {
 
     // Không có results 
     if ((results as any).length === 0) {
-      res.status(404).json({ message: 'No bookings found for this user' });
+      res.status(404).json({ message: 'No booking found for this user' });
       return;
     }
 
