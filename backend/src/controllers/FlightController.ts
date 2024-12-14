@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import connection from '../database/database';
 import { OkPacket } from 'mysql2'; 
-import { RowDataPacket } from 'mysql2';
+import { RowDataPacket } from 'mysql2/';
 // CHỨC NĂNG USER
   //1. Xem Thông tin tất cả các chuyến bay 
 export const getAllFlights = (req: Request, res: Response) => {
@@ -17,55 +17,39 @@ export const getAllFlights = (req: Request, res: Response) => {
 };
   //2. Tìm chuyến bay
 export const searchFlights = (req: Request, res: Response): void => {
-  const { departure, arrival, departureTime, arrivalTime } = req.body;
-  let conditions: string[] = [];
-  let params: (string | number)[] = [];
-    // Check Departure
-  if (departure) {
-    conditions.push('Departure LIKE ?');
-    params.push(`%${departure}%`);
+  // Lấy flightID từ body của request
+  const { flightID } = req.body;
+
+  // Kiểm tra xem flightID có tồn tại không
+  if (!flightID) {
+    res.status(400).json({ message: 'FlightID is required' });
+    return;
   }
-    // Check Arrival
-  if (arrival) {
-    conditions.push('Arrival LIKE ?');
-    params.push(`%${arrival}%`);
-  }
-    // Check DepartureTime
-  if (departureTime) {
-    conditions.push('DepartureTime >= ?');
-    params.push(departureTime);
-  }
-    //Check ArrivalTime
-  if (arrivalTime) {
-    conditions.push('ArrivalTime <= ?');
-    params.push(arrivalTime);
-  }
-    //Query
-  let query = 'SELECT * FROM Flights';
-  if (conditions.length > 0) {
-    query += ' WHERE ' + conditions.join(' AND ');
-  }
-    //Truy vấn 
-  connection.query(query, params, (err, results) => {
+
+  // Truy vấn tìm chuyến bay theo flightID
+  const query = 'SELECT * FROM Flights WHERE FlightID = ?';
+
+  connection.query(query, [flightID], (err, results) => {
     if (err) {
       console.error('Error executing query:', err.stack);
       res.status(500).json({ message: 'Internal Server Error', error: err.message });
       return;
     }
-    // Nếu không có results?
-    if (Array.isArray(results) && results.length === 0) {
-      res.status(404).json({ message: 'No flights found matching your criteria' });
+
+    // Ép kiểu kết quả thành RowDataPacket[]
+    const flightResults = results as RowDataPacket[];
+
+    // Kiểm tra nếu không có chuyến bay nào được tìm thấy
+    if (flightResults.length === 0) {
+      res.status(404).json({ message: 'Flight not found' });
       return;
     }
-    // Nếu results là QueryResult
-    if (results && 'length' in results) {
-      res.status(200).json(results);
-    } else {
-    // Nếu results là OkPacket, không có chuyến bay trả về
-      res.status(404).json({ message: 'No flights found matching your criteria' });
-    }
+
+    // Trả về chuyến bay đầu tiên nếu có
+    res.status(200).json(flightResults[0]);
   });
 };
+
 //3. Đặt vé
 export const bookFlight = (req: Request, res: Response): void => {
   const { userID, flightID } = req.body;
@@ -275,33 +259,33 @@ export const getUserFlights = (req: Request, res: Response): void => {
 };
 //CHỨC NĂNG ADMIN
   //1. Tạo thông tin
-  export const createNotification = (req: Request, res: Response): void => {
+  export const CreateOffer = (req: Request, res: Response): void => {
     const { title, content, type } = req.body;
     if (!title || !content || !type) {
       res.status(400).json({ message: 'Missing required fields: title, content, type' });
       return;
     }
-    const query = 'INSERT INTO Notifications (Title, Content, Type) VALUES (?, ?, ?)';
+    const query = 'INSERT INTO OFFER (Title, Content, Type) VALUES (?, ?, ?)';
     connection.query(query, [title, content, type], (err, results) => {
       if (err) {
         console.error('Error inserting notification:', err);
-        res.status(500).json({ message: 'Failed to create notification' });
+        res.status(500).json({ message: 'Failed to create Offer' });
         return;
       }
       res.status(201).json({
-        message: 'Notification created successfully',
+        message: 'Offer created successfully',
         postID: (results as any).insertId, // ID của bài đăng mới
       });
     });
   };
   //2. Đăng thông tin
-export const getNotificationByID = (req: Request, res: Response): void => {
+export const GetOfferByID = (req: Request, res: Response): void => {
   const { postID } = req.body;
   if (!postID){
     res.status(400).json({ message: 'Missing required fields: postID' });
     return;
   }
-  const query = 'SELECT * FROM Notifications WHERE PostID = ?';
+  const query = 'SELECT * FROM OFFER WHERE PostID = ?';
   connection.query(query, [postID], (err, results) => {
     if (err) {
       console.error('Error fetching notification:', err);
@@ -311,12 +295,44 @@ export const getNotificationByID = (req: Request, res: Response): void => {
     const flightResults = results as RowDataPacket[];
     // Kiểm tra xem có kết quả hay không
     if (flightResults.length === 0) {
-      res.status(404).json({ message: 'Notification not found' });
+      res.status(404).json({ message: 'Offer not found' });
       return;
     }
     const flight = flightResults[0];
     // Trả về thông báo chi tiết
     res.status(200).json(flightResults[0]);
+  });
+};
+
+//3. Xóa thông tin 
+export const deleteOffer = (req: Request, res: Response): void => {
+  const { postID } = req.body;  // Lấy postID từ body của request
+
+  // Kiểm tra xem postID có tồn tại không
+  if (!postID) {
+    res.status(400).json({ message: 'postID is required' });
+    return;
+  }
+
+  // Truy vấn xóa thông tin offer (Notification) theo postID
+  const query = 'DELETE FROM OFFER WHERE PostID = ?';
+
+  connection.query(query, [postID], (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err.stack);
+      res.status(500).json({ message: 'Internal Server Error', error: err.message });
+      return;
+    }
+
+    // Kiểm tra xem offer có bị xóa hay không
+    const result = results as OkPacket;
+    if (result.affectedRows === 0) {
+      res.status(404).json({ message: 'Offer not found' });
+      return;
+    }
+
+    // Trả về thông báo thành công nếu xóa thành công
+    res.status(200).json({ message: 'Offer deleted successfully' });
   });
 };
   //3. Nhập dữ liệu chuyến bay mới
@@ -362,8 +378,14 @@ export const deleteFlight = (req: Request, res: Response): void => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Flight not found' });
     }
-
+    const vietnamTime = new Date();
+    vietnamTime.setHours(vietnamTime.getHours()); // Thêm 7 giờ để chuyển sang UTC+7
+    const timestamp = vietnamTime.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
     // Trả thông báo xóa thành công
-    return res.status(200).json({ message: 'Flight deleted successfully' });
+    return res.status(200).json({ 
+      message: 'Flight deleted successfully', // Thông báo chung về việc xóa chuyến bay
+      timestampMessage: `Flight deleted at ${timestamp}` // Thông báo timestamp riêng biệt
+    });
   });
 };
+

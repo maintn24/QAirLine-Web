@@ -1,8 +1,6 @@
-
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
 dotenv.config();
-
 // Cấu hình kết nối MySQL
 const connection = mysql.createConnection({
   host: process.env.MYSQL_HOST,
@@ -10,7 +8,6 @@ const connection = mysql.createConnection({
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DATABASE,
 });
-
 // Kết nối tới MySQL
 connection.connect((err) => {
   if (err) {
