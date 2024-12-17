@@ -23,32 +23,11 @@ export default function AircraftForm({aircraft, onClose, onSubmit}: AircraftForm
         setFormData({...formData, [name]: value});
     }
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-    
-        const method = aircraft?.ID ? 'PUT' : 'POST'; // Nếu có ID thì update, nếu không thì thêm mới
-        const url = aircraft?.ID ? `/api/aircrafts/${aircraft.ID}` : '/api/aircrafts';
-    
-        try {
-            const response = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            });
-    
-            if (response.ok) {
-                const result = await response.json();
-                console.log(result.message || 'Success'); // Log thông báo từ server
-    
-                onSubmit(result.aircraft || formData); // Cập nhật state ở component cha
-                onClose(); // Đóng form
-            } else {
-                console.error('Error saving aircraft');
-            }
-        } catch (error) {
-            console.error('Error during submission:', error);
-        }
-    };
+        onSubmit(formData); // Gửi dữ liệu lên page chính
+      };
+      
 
     return(
         <div className={styles.overlay}>
