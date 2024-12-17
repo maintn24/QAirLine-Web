@@ -15,7 +15,7 @@ export default function AircraftManagementPage() {
   useEffect(() => {
     async function fetchAircrafts() {
       try {
-        const response = await fetch('/api/aircrafts');
+        const response = await fetch('/Aircrafts/GetAll');
         const data = await response.json();
         setAircrafts(data);
       } catch (error) {
@@ -37,7 +37,7 @@ export default function AircraftManagementPage() {
 
   const handleDeleteAircraft = async (id: number) => {
     try {
-      await fetch(`/api/aircrafts/${id}`, { method: 'DELETE' });
+      await fetch(`/Aircrafts/Delete`, { method: 'POST' });
       setAircrafts(aircrafts.filter((a) => a.ID !== id));
     } catch (error) {
       console.error('Error deleting aircraft:', error);
@@ -48,8 +48,8 @@ export default function AircraftManagementPage() {
     try {
       const method = selectedAircraft ? 'PUT' : 'POST';
       const url = selectedAircraft
-        ? `/api/aircrafts/${formData.ID}` // Update aircraft
-        : '/api/aircrafts'; // Add new aircraft
+        ? `/Aircrafts/Update` // Update aircraft
+        : '/Aircrafts/Aircrafts'; // Add new aircraft
   
       const response = await fetch(url, {
         method,
