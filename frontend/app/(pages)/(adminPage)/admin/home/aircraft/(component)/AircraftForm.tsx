@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
 import styles from './styles/aircraftForm.module.css';
-
-type Aircraft = {
-    ID: number;
-    Model: string;
-    Manufacture: string;
-    Capacity: number;
-    Range: number;
-    Description: string;
-};
+import { Aircraft } from '../aircraftObject';
 
 type AircraftFormProps = {
     aircraft: Aircraft | null;
@@ -31,12 +23,32 @@ export default function AircraftForm({aircraft, onClose, onSubmit}: AircraftForm
         setFormData({...formData, [name]: value});
     }
 
-    const handleSubmit = (e:React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (onSubmit) {
-            onSubmit(formData); // Kiểm tra onsubmit không phải null trước khi gọi
+    
+        const method = aircraft?.ID ? 'PUT' : 'POST'; // Nếu có ID thì update, nếu không thì thêm mới
+        const url = aircraft?.ID ? `/api/aircrafts/${aircraft.ID}` : '/api/aircrafts';
+    
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+    
+            if (response.ok) {
+                const result = await response.json();
+                console.log(result.message || 'Success'); // Log thông báo từ server
+    
+                onSubmit(result.aircraft || formData); // Cập nhật state ở component cha
+                onClose(); // Đóng form
+            } else {
+                console.error('Error saving aircraft');
+            }
+        } catch (error) {
+            console.error('Error during submission:', error);
         }
-    }
+    };
 
     return(
         <div className={styles.overlay}>

@@ -3,15 +3,8 @@ import React, {useState, useEffect} from 'react';
 import styles from "./aircraftPage.module.css";
 import AircraftTable from './(component)/AircraftTable';
 import AircraftForm from './(component)/AircraftForm';
+import { Aircraft } from './aircraftObject';
 
-type Aircraft = {
-  ID: number;
-  Model: string;
-  Manufacture: string;
-  Capacity: number;
-  Range: number;
-  Description: string;
-};
 
 export default function AircraftManagementPage() {
   const [aircrafts, setAircrafts] = useState<Aircraft[]>([]);
@@ -51,16 +44,39 @@ export default function AircraftManagementPage() {
     }
   };
 
-  const handleFormSubmit = (newAircraft: Aircraft) => {
-    if (selectedAircraft) {
-      // Edit existing aircraft
-      setAircrafts(aircrafts.map((a) => (a.ID === newAircraft.ID ? newAircraft : a)));
-    } else {
-      // Add new aircraft
-      setAircrafts([...aircrafts, newAircraft]);
+  const handleFormSubmit = async (formData: Aircraft) => {
+    try {
+      const method = selectedAircraft ? 'PUT' : 'POST';
+      const url = selectedAircraft
+        ? `/api/aircrafts/${formData.ID}` // Update aircraft
+        : '/api/aircrafts'; // Add new aircraft
+  
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+  
+      if (!response.ok) throw new Error('Failed to save aircraft');
+  
+      const savedAircraft = await response.json();
+  
+      setAircrafts((prevAircrafts) => {
+        if (selectedAircraft) {
+          // Cập nhật bản ghi đã tồn tại
+          return prevAircrafts.map((a) => (a.ID === savedAircraft.ID ? savedAircraft : a));
+        } else {
+          // Thêm mới bản ghi
+          return [...prevAircrafts, savedAircraft];
+        }
+      });
+  
+      setIsFormOpen(false); // Đóng form
+    } catch (error) {
+      console.error('Error submitting aircraft data:', error);
     }
-    setIsFormOpen(false);
   };
+  
 
   return(
     <div className={styles.container}>

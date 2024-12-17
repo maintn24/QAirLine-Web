@@ -1,15 +1,7 @@
 import React from "react";
 import styles from './styles/aircraftTable.module.css';
 import { Chocolate_Classical_Sans } from "next/font/google";
-
-type Aircraft = {
-    ID: number;
-    Model: string;
-    Manufacture: string;
-    Capacity: number;
-    Range: number;
-    Description: string;
-}
+import { Aircraft } from "../aircraftObject";
 
 type aircraftTableProps = {
     aircrafts: Aircraft[];
