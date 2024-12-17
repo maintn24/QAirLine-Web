@@ -21,7 +21,7 @@ const TableContainer = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("https://sample.com/api/data");
+        const response = await fetch("http://localhost:3001/api/data");
         if (!response.ok) throw new Error("Failed to fetch data");
         const result = await response.json();
         setData(result); // Giả sử API trả về mảng
