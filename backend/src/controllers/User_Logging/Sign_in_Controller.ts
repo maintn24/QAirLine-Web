@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import connection from "../../database/database";  // Import kết nối từ file database.ts
+import connection from "../../database/database";  
 
 export const signIn = (req: Request, res: Response) => {
   const { email, password } = req.body;  // Đổi từ Username thành Email
-
   // Truy vấn tìm người dùng trong cơ sở dữ liệu bằng email
   connection.execute('SELECT * FROM Users WHERE Email = ?', [email], async (err, results) => {
     if (err) {
