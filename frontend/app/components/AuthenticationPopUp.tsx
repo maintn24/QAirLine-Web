@@ -64,7 +64,7 @@ const AuthenticationPopUp: React.FC<LoginPopupProps> = ({ visible, setVisible })
     }, []);
 
     const handleSignUp = async (e: React.FormEvent) => {
-        localStorage.removeItem('token');
+        localStorage.clear();
         e.preventDefault();
 
         // Reset error state
@@ -75,7 +75,6 @@ const AuthenticationPopUp: React.FC<LoginPopupProps> = ({ visible, setVisible })
             return;
         }
         try {
-            console.log(JSON.stringify(signUpData))
             const response = await fetch('http://localhost:3001/api/auth/signup', {
                 method: 'POST',
                 headers: {
@@ -98,7 +97,7 @@ const AuthenticationPopUp: React.FC<LoginPopupProps> = ({ visible, setVisible })
     };
 
     const handleSignIn = async (e: React.FormEvent) => {
-        localStorage.removeItem('token');
+        localStorage.clear();
         e.preventDefault();
 
         // Reset error state

@@ -1,44 +1,48 @@
 'use client'
 import styles from "./adminLoginPage.module.css";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { useRouter } from "next/navigation";
+import {jwtDecode, JwtPayload} from "jwt-decode";
 
 export default function AdminLoginPage(){
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState(""); // Hiển thị lỗi
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
-    const handleSubmit: React.FormEventHandler = async (e) => {
-        e.preventDefault(); // Ngăn form reload trang
-        setError(""); // Reset lỗi cũ
+    const handleSubmit = async (e: React.FormEvent) => {
+        localStorage.clear();
+        e.preventDefault();
 
-        try {
-            const response = await fetch("http://localhost:3001/auth/signin", {
-                method: "POST",
-                headers: {
-                "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ username, password }),
-            });
+        // Reset error state
+        setError(null);
 
-            const data = await response.json();
-
-            if (response.ok) {
-                // Kiểm tra role admin
-                if (data.role === "admin") {
-                    alert("Login successful! Redirecting...");
-                    router.push("/admin/home"); // Chuyển hướng đến trang admin
-                }else {
-                    setError("You are not authorized to access this page.");
-                }
-            } else {
-                setError(data.message || "Invalid username or password.");
-            }   
-        }catch (err) {
-            setError("An error occurred. Please try again later.");
+        if (!email || !password) {
+            console.error('All fields are required for signin');
+            return;
         }
-    }
+        try {
+            const response = await fetch('http://localhost:3001/api/auth/signin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
+            const data = await response.json();
+            if (response.ok) {
+                localStorage.setItem('token', data.token);
+                const decoded = jwtDecode<JwtPayload & { role?: string }>(data.token);
+                alert('Signin successful');
+                router.push('/admin/home');
+
+            } else {
+                setError(data.message || 'Login failed. Please try again.');
+            }
+        } catch (error) {
+            setError('Something went wrong. Please try again later.' + error);
+        }
+    };
 
 
     return(
@@ -47,17 +51,17 @@ export default function AdminLoginPage(){
                 <h1 className={styles.title}>Admin Login Page</h1>
                 <form onSubmit={handleSubmit}>
                 <div className={styles.inputContainer}>
-                    <label htmlFor="username" className={styles.label}>
-                        Username
+                    <label htmlFor="email" className={styles.label}>
+                        Email
                     </label>
                     <input
                         type="text"
-                        id="username"
-                        name="username"
+                        id="email"
+                        name="email"
                         className={styles.input}
-                        placeholder="Enter your Username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Enter your Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                     />
                 </div>
                 <div className={styles.inputContainer}>
