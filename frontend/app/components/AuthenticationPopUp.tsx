@@ -27,6 +27,7 @@ const AuthenticationPopUp: React.FC<LoginPopupProps> = ({ visible, setVisible })
     const [signUpData, setSignUpData] = useState({ name: '', username: '', email: '', password: '', role: 'Customer' });
     const [signInData, setSignInData] = useState({ email: '', password: '' });
     const [error, setError] = useState<string | null>(null);
+    const [userID, setUserID] = useState<string | null>(null);
     const router = useRouter();
 
     const handleSignUpClick = () => {
@@ -55,6 +56,9 @@ const AuthenticationPopUp: React.FC<LoginPopupProps> = ({ visible, setVisible })
                     console.log('Decoded User ID:', decoded.userid);
                     localStorage.setItem('userid', decoded.userid as string);
                     console.log('Decoded token:', decoded);
+                    
+                    localStorage.setItem("userID", decoded.userid? decoded.userid: "null");
+                    
                 } catch (error) {
                     console.error('Error decoding token:', error);
                 }
