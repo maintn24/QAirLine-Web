@@ -4,7 +4,6 @@ import { OkPacket } from 'mysql2';
 // Chức năng xem tất cả người dùng
 export const getAllUsers = (req: Request, res: Response): void => {
   const query = 'SELECT * FROM Users';
-
   connection.query(query, (err, results) => {
     if (err) {
       console.error('Error executing query:', err.stack);
