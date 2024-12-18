@@ -268,16 +268,32 @@ export const getUserFlights = (req: Request, res: Response): void => {
 //CHỨC NĂNG ADMIN
   //1. Tạo thông tin
   export const CreateOffer = (req: Request, res: Response): void => {
-    const { title, content, type, UserID } = req.body;
-  
-    // Kiểm tra xem các trường dữ liệu có đầy đủ hay không
-    if (!title || !content || !type || !UserID) {
-      res.status(400).json({ message: 'Missing required fields: title, content, type, or UserID' });
+  const { title, content, UserID } = req.body;
+
+  // Kiểm tra xem các trường dữ liệu có đầy đủ hay không
+  if (!title || !content || !UserID) {
+    res.status(400).json({ message: 'Missing required fields: title, content, or UserID' });
+    return;
+  }
+
+  // Kiểm tra xem người dùng có phải là admin hay không
+  const adminQuery = 'SELECT Role FROM Users WHERE UserID = ?';
+  connection.query(adminQuery, [UserID], (err, results: any) => {
+    if (err) {
+      console.error('Error checking user role:', err);
+      res.status(500).json({ message: 'Failed to verify user role' });
       return;
     }
-  
-    const query = 'INSERT INTO Offers (Title, Content, Type, CreatedBy) VALUES (?, ?, ?, ?)';
-    connection.query(query, [title, content, type, UserID], (err, results) => {
+
+    // Kiểm tra kết quả trả về có hợp lệ không và người dùng có Role là Admin
+    if (!Array.isArray(results) || results.length === 0 || results[0].Role !== 'Admin') {
+      res.status(403).json({ message: 'Permission denied: User is not an admin' });
+      return;
+    }
+
+    // Thực hiện tạo Offer nếu người dùng là admin
+    const query = 'INSERT INTO Offers (Title, Content) VALUES (?, ?)';
+    connection.query(query, [title, content, UserID], (err, results: any) => {
       if (err) {
         console.error('Error inserting notification:', err);
         res.status(500).json({ message: 'Failed to create Offer' });
@@ -285,11 +301,11 @@ export const getUserFlights = (req: Request, res: Response): void => {
       }
       res.status(201).json({
         message: 'Offer created successfully',
-        postID: (results as any).insertId, // ID của bài đăng mới
       });
     });
-  };
-  
+  });
+};
+
 //2. Lấy danh sách Offers
   export const getAllOffers = (req: Request, res: Response): void => {
     const query = 'SELECT PostID,Title,Content,PostDate FROM Offers';
@@ -366,7 +382,7 @@ export const getUserFlights = (req: Request, res: Response): void => {
       });
     });
   };
-  
+  //4. Xóa Offer
   export const deleteOffer = (req: Request, res: Response): void => {
     const { postID, UserID } = req.body;
   
@@ -393,7 +409,7 @@ export const getUserFlights = (req: Request, res: Response): void => {
       res.status(200).json({ message: 'Offer deleted successfully' });
     });
   };
-  
+  //5. Nhập dữ liệu Chuyến bay
   export const addFlight = (req: Request, res: Response): void => {
     const { AircraftTypeID, Departure, Arrival, DepartureTime, ArrivalTime, Price, SeatsAvailable, Status, UserID } = req.body;
   
@@ -419,7 +435,7 @@ export const getUserFlights = (req: Request, res: Response): void => {
       res.status(201).json({ message: 'Flight added successfully', flightID });
     });
   };
-  
+  //6. Xóa chuyến bay
   export const deleteFlight = (req: Request, res: Response): void => {
     const { flightID, UserID } = req.body;
   
