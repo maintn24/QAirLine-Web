@@ -25,6 +25,7 @@ const PaymentPage = () => {
             return;
         }
         setUserID(userID);
+        console.log('User ID:', userID);
     }, []);
 
     const handlePurchase = async () => {

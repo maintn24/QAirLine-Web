@@ -13,7 +13,7 @@ export default function Header() {
 
   // Lấy userID từ localStorage khi component được mount
   useEffect(() => {
-    const storedUserID = localStorage.getItem("userID");
+    const storedUserID = localStorage.getItem("userid");
     setUserID(storedUserID);
   }, []);
 

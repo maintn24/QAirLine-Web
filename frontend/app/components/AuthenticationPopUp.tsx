@@ -57,7 +57,7 @@ const AuthenticationPopUp: React.FC<LoginPopupProps> = ({ visible, setVisible })
                     localStorage.setItem('userid', decoded.userid as string);
                     console.log('Decoded token:', decoded);
                     
-                    localStorage.setItem("userID", decoded.userid? decoded.userid: "null");
+                    localStorage.setItem("userid", decoded.userid? decoded.userid: "null");
                     
                 } catch (error) {
                     console.error('Error decoding token:', error);
