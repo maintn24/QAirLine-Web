@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import connection from "../../database/database";  // Import kết nối từ file database.ts
+import connection from "../../database/database";  
 
 export const signIn = (req: Request, res: Response) => {
-  const { Email, Password } = req.body;  // Đổi từ Username thành Email
+  const { Email, Password } = req.body;  
 
   // Truy vấn tìm người dùng trong cơ sở dữ liệu bằng email
   connection.execute('SELECT * FROM Users WHERE Email = ?', [Email], async (err, results) => {
@@ -16,7 +16,7 @@ export const signIn = (req: Request, res: Response) => {
     // Kiểm tra xem có người dùng hay không
     const rows = results as any[];
     if (rows.length === 0) {
-      return res.status(404).json({ message: 'User not found' });  // Nếu không tìm thấy user với email
+      return res.status(404).json({message: 'User not found' });  // Nếu không tìm thấy user với email
     }
 
     const user = rows[0];

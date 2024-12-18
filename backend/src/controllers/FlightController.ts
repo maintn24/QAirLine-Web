@@ -18,10 +18,10 @@ export const getAllFlights = (req: Request, res: Response) => {
   //2. Tìm chuyến bay
 export const searchFlights = (req: Request, res: Response): void => {
   // Lấy flightID từ body của request
-  const { flightID } = req.body;
+  const { FlightID } = req.body;
 
   // Kiểm tra xem flightID có tồn tại không
-  if (!flightID) {
+  if (!FlightID) {
     res.status(400).json({ message: 'FlightID is required' });
     return;
   }
@@ -29,7 +29,7 @@ export const searchFlights = (req: Request, res: Response): void => {
   // Truy vấn tìm chuyến bay theo flightID
   const query = 'SELECT * FROM Flights WHERE FlightID = ?';
 
-  connection.query(query, [flightID], (err, results) => {
+  connection.query(query, [FlightID], (err, results) => {
     if (err) {
       console.error('Error executing query:', err.stack);
       res.status(500).json({ message: 'Internal Server Error', error: err.message });
@@ -52,26 +52,26 @@ export const searchFlights = (req: Request, res: Response): void => {
 
 //3. Đặt vé
 export const bookFlight = (req: Request, res: Response): void => {
-  const { userID, flightID } = req.body;
+  const { UserID, FlightID } = req.body;
   // Check 2 trường userID và flightID xem có hợp lệ không 
-  if (!userID || !flightID) {
+  if (!UserID || !FlightID) {
     res.status(400).json({ message: 'Missing required fields: userID or flightID' });
     return;
   }
   const flightQuery = 'SELECT * FROM Flights WHERE FlightID = ?';
-  connection.query(flightQuery, [flightID], (err, results) => {
+  connection.query(flightQuery, [FlightID], (err, results) => {
     if (err) {
       console.error('Error querying flights:', err);
       res.status(500).json({ message: 'Internal server error' });
       return;
     }
-    const flightResults = results as RowDataPacket[];
-    if (flightResults.length === 0) {
+    const FlightResults = results as RowDataPacket[];
+    if (FlightResults.length === 0) {
       res.status(404).json({ message: 'Flight not found' });
       return;
     }
 
-    const flight = flightResults[0];
+    const flight = FlightResults[0];
 
     //Check SeatsAvailable
     if (flight.SeatsAvailable <= 0) {
@@ -79,7 +79,7 @@ export const bookFlight = (req: Request, res: Response): void => {
       return;
     }
     const checkBookingQuery = 'SELECT * FROM Bookings WHERE UserID = ? AND FlightID = ?';
-    connection.query(checkBookingQuery, [userID, flightID], (err, results) => {
+    connection.query(checkBookingQuery, [UserID, FlightID], (err, results) => {
       if (err) {
         console.error('Error checking existing booking:', err);
         res.status(500).json({ message: 'Internal server error' });
@@ -104,7 +104,7 @@ export const bookFlight = (req: Request, res: Response): void => {
           }
           // Update SeatAvailable
           const updateSeatsQuery = 'UPDATE Flights SET SeatsAvailable = SeatsAvailable - 1 WHERE FlightID = ?';
-          connection.query(updateSeatsQuery, [flightID], (err, results) => {
+          connection.query(updateSeatsQuery, [FlightID], (err, results) => {
             if (err) {
               console.error('Error updating flight seats:', err);
               res.status(500).json({ message: 'Failed to update flight seat availability' });
@@ -115,15 +115,15 @@ export const bookFlight = (req: Request, res: Response): void => {
             res.status(201).json({
               message: 'Booking re-confirmed successfully, flight re-booked',
               bookingID,
-              flightID,
-              userID,
+              FlightID,
+              UserID,
             });
           });
         });
       } else {
         // Nếu chưa hủy vé trước đó, cho phép đặt vé mới (không trùng userID,flightID)
         const bookingQuery = 'INSERT INTO Bookings (UserID, FlightID) VALUES (?, ?)';
-        connection.query(bookingQuery, [userID, flightID], (err, results) => {
+        connection.query(bookingQuery, [UserID, FlightID], (err, results) => {
           if (err) {
             console.error('Error creating booking:', err);
             res.status(500).json({ message: 'Failed to create booking' });
@@ -134,7 +134,7 @@ export const bookFlight = (req: Request, res: Response): void => {
 
           // Update SeatsAvailable
           const updateFlightQuery = 'UPDATE Flights SET SeatsAvailable = SeatsAvailable - 1 WHERE FlightID = ?';
-          connection.query(updateFlightQuery, [flightID], (err, results) => {
+          connection.query(updateFlightQuery, [FlightID], (err, results) => {
             if (err) {
               console.error('Error updating flight seats:', err);
               res.status(500).json({ message: 'Failed to update flight seat availability' });
@@ -145,8 +145,8 @@ export const bookFlight = (req: Request, res: Response): void => {
             res.status(201).json({
               message: 'Booking confirmed',
               bookingID,
-              flightID,
-              userID,
+              FlightID,
+              UserID,
             });
           });
         });
@@ -304,7 +304,72 @@ export const GetOfferByID = (req: Request, res: Response): void => {
   });
 };
 
-//3. Xóa thông tin 
+//3. Nhập dữ liệu Tàu bay
+ // Tính năng thêm tàu bay với kiểm tra trùng lặp
+export const addAircraft = (req: Request, res: Response): void => {
+  const { Model, Manufacturer, Capacity, RangeKm, Description } = req.body;
+
+  // Kiểm tra xem các trường dữ liệu có đầy đủ hay không
+  if (!Model || !Manufacturer || !Capacity || !RangeKm) {
+    res.status(400).json({
+      message: 'Missing required fields: Model, Manufacturer, Capacity, or RangeKm',
+    });
+    return;
+  }
+
+  // Truy vấn kiểm tra xem tàu bay đã tồn tại hay chưa
+  const checkQuery = `
+    SELECT * FROM Aircrafts 
+    WHERE Model = ? AND Manufacturer = ?
+  `;
+
+  connection.query(checkQuery, [Model, Manufacturer], (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err.stack);
+      res.status(500).json({
+        message: 'Internal Server Error',
+        error: err.message,
+      });
+      return;
+    }
+
+    // Nếu tìm thấy tàu bay trùng lặp
+    if ((results as RowDataPacket[]).length > 0) {
+      res.status(400).json({
+        message: 'Aircraft with the same Model and Manufacturer already exists',
+      });
+      return;
+    }
+
+    // Nếu không trùng lặp, thêm tàu bay mới
+    const insertQuery = `
+      INSERT INTO Aircrafts (Model, Manufacturer, Capacity, RangeKm, Description) 
+      VALUES (?, ?, ?, ?, ?)
+    `;
+
+    connection.query(insertQuery, [Model, Manufacturer, Capacity, RangeKm, Description], (err, results) => {
+      if (err) {
+        console.error('Error executing query:', err.stack);
+        res.status(500).json({
+          message: 'Internal Server Error',
+          error: err.message,
+        });
+        return;
+      }
+
+      const aircraftID = (results as OkPacket).insertId;
+
+      // Trả thông báo thành công
+      res.status(201).json({
+        message: 'Aircraft added successfully',
+        aircraftID,
+      });
+    });
+  });
+};
+
+
+//4. Xóa thông tin 
 export const deleteOffer = (req: Request, res: Response): void => {
   const { postID } = req.body;  // Lấy postID từ body của request
 
@@ -335,7 +400,7 @@ export const deleteOffer = (req: Request, res: Response): void => {
     res.status(200).json({ message: 'Offer deleted successfully' });
   });
 };
-  //3. Nhập dữ liệu chuyến bay mới
+  //5. Nhập dữ liệu chuyến bay mới
 export const addFlight = (req: Request, res: Response): void => {
     // cần body
   const { AircraftTypeID, Departure, Arrival, DepartureTime, ArrivalTime, Price, SeatsAvailable, Status } = req.body;
