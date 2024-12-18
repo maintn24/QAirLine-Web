@@ -1,32 +1,62 @@
 // pages/offers/index.tsx
 'use client';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from "./offerPage.module.css";
 
-interface offer {
+interface Offer {
   id: number;
   title: string;
   description: string;
   postDate: string;
 }
 
-const offerList: offer[] = [
-  { id: 1, title: 'Offer 1', description: 'Details about offer 1', postDate:'11/12/2024' },
-  { id: 2, title: 'Offer 2', description: 'Details about offer 2', postDate:'11/12/2024' },
-  { id: 3, title: 'Offer 3', description: 'Details about offer 3', postDate:'11/12/2024' },
-  { id: 4, title: 'Offer 4', description: 'Details about offer 4', postDate:'11/12/2024' },
-  { id: 5, title: 'Offer 5', description: 'Details about offer 5', postDate:'11/12/2024' },
-  { id: 6, title: 'Offer 6', description: 'Details about offer 6', postDate:'11/12/2024' },
-  { id: 7, title: 'Offer 7', description: 'Details about offer 7', postDate:'11/12/2024' },
-  { id: 8, title: 'Offer 8', description: 'Details about offer 8', postDate:'11/12/2024' }
-];
 
 const OffersPage = () => {
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch data từ API
+  useEffect(() => {
+    const fetchOffers = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/api/Offers/GetAllOffers');
+        if (!response.ok) {
+          throw new Error('Failed to fetch offers');
+        }
+        const data = await response.json();
+        // Map dữ liệu từ API thành format của Offer
+        const formattedOffers = data.map((offer: any) => ({
+          id: offer.PostID,
+          title: offer.Title,
+          description: offer.Content,
+          postDate: offer.PostDate,
+        }));
+        setOffers(formattedOffers);
+      } catch (error: any) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchOffers();
+  }, []);
+
+  if (loading) {
+    return <div className={styles.container}>Loading offers...</div>;
+  }
+
+  if (error) {
+    return <div className={styles.container}>Error: {error}</div>;
+  }
+  
   return (
     <div className={styles.container}>
       <h1 className={styles.heading}>Offers</h1>
       <div className={styles.offerGrid}>
-        {offerList.map((offer) => (
+        {offers.map((offer) => (
           <Link
             href={{
               pathname: `/offers/${offer.id}`,
