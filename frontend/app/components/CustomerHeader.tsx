@@ -3,7 +3,7 @@ import React from "react";
 import { useState } from "react";
 import {usePathname, useRouter} from 'next/navigation';
 import style from "./styles/CustomerHeader.module.css";
-import SignIn_SignUp_PopUp from "@/app/components/SignIn_SignUp_PopUp";
+import AuthenticationPopUp from "@/app/components/AuthenticationPopUp";
 
 export default function Header() {
 	const [isVisible, setIsVisible] = useState(false);
@@ -52,7 +52,7 @@ export default function Header() {
 							<li onClick={handleLoginClick}>Login | Register</li>
 						</ul>
 					</nav>
-					<SignIn_SignUp_PopUp visible={isVisible} setVisible={setIsVisible}/>
+					<AuthenticationPopUp visible={isVisible} setVisible={setIsVisible}/>
 				</div>
 			</div>
 		</header>

@@ -4,10 +4,9 @@ import jwt from 'jsonwebtoken';
 import connection from "../../database/database";  
 
 export const signIn = (req: Request, res: Response) => {
-  const { Email, Password } = req.body;  
-
+  const { email, password } = req.body;  // Đổi từ Username thành Email
   // Truy vấn tìm người dùng trong cơ sở dữ liệu bằng email
-  connection.execute('SELECT * FROM Users WHERE Email = ?', [Email], async (err, results) => {
+  connection.execute('SELECT * FROM Users WHERE Email = ?', [email], async (err, results) => {
     if (err) {
       console.error('Database query error:', err);
       return res.status(500).json({ message: 'Error querying database' });
@@ -16,21 +15,27 @@ export const signIn = (req: Request, res: Response) => {
     // Kiểm tra xem có người dùng hay không
     const rows = results as any[];
     if (rows.length === 0) {
-      return res.status(404).json({message: 'User not found' });  // Nếu không tìm thấy user với email
+      return res.status(401).json({ message: 'Invalid email or password' });  // Nếu không tìm thấy user với email
     }
 
     const user = rows[0];
 
     // Kiểm tra mật khẩu với bcrypt
-    const isMatch = await bcrypt.compare(Password, user.Password);
+    bcrypt.compare(password, user.Password, (err, isMatch) => {
+      if (err) {
+        console.error('Error comparing passwords:', err);
+        return res.status(500).json({ message: 'Error comparing passwords' });
+      }
 
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });  // Nếu mật khẩu không khớp
-    }
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid email or password' });
+      }
+    });
 
-    // Tạo JWT token
+
+      // Tạo JWT token
     const token = jwt.sign(
-      { UserID: user.UserID, Email: user.Email, Role: user.Role },  // Chuyển Username thành Email trong token
+      { userid: user.UserID, email: user.Email, username: user.Username, name: user.Name, role: user.Role },  // Chuyển Username thành Email trong token
       'secret_key',  // Secret key (nên lấy từ môi trường)
       { expiresIn: '1h' }
     );

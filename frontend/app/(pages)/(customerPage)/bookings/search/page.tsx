@@ -36,7 +36,7 @@ const FlightBooking: React.FC = () => {
     useEffect(() => {
         const fetchFlights = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/flights');
+                const response = await fetch('http://localhost:3001/api/Flights/GetAllFlights');
                 const data = await response.json();
 
                 if (response.ok && Array.isArray(data)) {

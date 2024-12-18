@@ -5,10 +5,10 @@ import jwt from 'jsonwebtoken';
 import connection from '../../database/database'; // Import kết nối từ file database.ts
 
 export const signUp = (req: Request, res: Response) => {
-  const { Name, Username, Email, Password, Role } = req.body;
+  const { name, username, email, password, role } = req.body;
 
   // Kiểm tra xem tên người dùng đã tồn tại hay chưa
-  connection.execute('SELECT * FROM Users WHERE Username = ? OR Email = ?', [Username, Email], (err, results) => {
+  connection.execute('SELECT * FROM Users WHERE Username = ? OR Email = ?', [username, email], (err, results) => {
     if (err) {
       console.error('Database query error:', err);
       return res.status(500).json({ message: 'Error querying database' });
@@ -22,7 +22,7 @@ export const signUp = (req: Request, res: Response) => {
     }
 
     // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
-    bcrypt.hash(Password, 10, (err, hashedPassword) => {
+    bcrypt.hash(password, 10, (err, hashedPassword) => {
       if (err) {
         console.error('Error hashing password:', err);
         return res.status(500).json({ message: 'Error hashing password' });
@@ -31,7 +31,7 @@ export const signUp = (req: Request, res: Response) => {
       // Thêm người dùng mới vào cơ sở dữ liệu
       connection.execute(
         'INSERT INTO Users (Name, Username, Email, Password, Role) VALUES (?, ?, ?, ?, ?)',
-        [Name, Username, Email, hashedPassword, Role],
+        [name, username, email, hashedPassword, role],
         (err, results) => {
           if (err) {
             console.error('Database insert error:', err);
@@ -43,7 +43,7 @@ export const signUp = (req: Request, res: Response) => {
           
           // Tạo JWT token cho người dùng mới đăng ký
           const token = jwt.sign(
-            { UserID: result.insertId, Username, Role },
+            { userid: result.insertId, email, username, name, role },
             'secret_key',  // Secret key (nên thay bằng giá trị thực tế khi triển khai)
             { expiresIn: '1h' }
           );
