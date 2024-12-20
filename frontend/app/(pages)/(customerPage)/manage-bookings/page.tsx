@@ -1,160 +1,114 @@
 'use client'
 import style from "./manage-bookings.module.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "@/app/global/global.css";
-import SearchBar from "@/app/components/SearchBar";
+import {useRouter} from "next/navigation";
 
 interface Ticket {
-    id: string;
-    startTime: string;
-    arriveTime: string;
-    startDate: string;
-    arriveDate: string;
-    startDestination: string;
-    arriveDestination: string;
-    duration: string;
-    planeType: string;
-    price: number;
-    seatType: "Economy" | "Business";
-    status: "Booked" | "Checked-in" | "Cancelled" | "Completed";
-    seatNumber: string;
+    BookingID: number;
+    BookingDate: string;
+    BookingStatus: string;
+    PaymentStatus: string;
+    FlightID: number;
+    AircraftTypeID: number;
+    Departure: string;
+    Arrival: string;
+    DepartureTime: string;
+    ArrivalTime: string;
+    Price: string;
+    SeatsAvailable: number;
+    FlightStatus: string;
 }
 
-const TicketList: Ticket[] = [
-    {
-        id: '1',
-        startTime: '08:00 AM',
-        arriveTime: '10:00 AM',
-        startDate: '2024-12-15',
-        arriveDate: '2024-12-15',
-        startDestination: 'New York (JFK)',
-        arriveDestination: 'Los Angeles (LAX)',
-        duration: '5h 30m',
-        planeType: 'Boeing 737',
-        price: 300,
-        seatType: 'Economy',
-        status: 'Booked',
-        seatNumber: '12A',
-    },
-    {
-        id: '2',
-        startTime: '01:00 PM',
-        arriveTime: '04:30 PM',
-        startDate: '2024-12-16',
-        arriveDate: '2024-12-16',
-        startDestination: 'Chicago (ORD)',
-        arriveDestination: 'Miami (MIA)',
-        duration: '3h 30m',
-        planeType: 'Airbus A320',
-        price: 200,
-        seatType: 'Business',
-        status: 'Checked-in',
-        seatNumber: '1B',
-    },
-    {
-        id: '3',
-        startTime: '06:00 PM',
-        arriveTime: '08:45 PM',
-        startDate: '2024-12-17',
-        arriveDate: '2024-12-17',
-        startDestination: 'San Francisco (SFO)',
-        arriveDestination: 'Seattle (SEA)',
-        duration: '2h 45m',
-        planeType: 'Boeing 757',
-        price: 150,
-        seatType: 'Economy',
-        status: 'Cancelled',
-        seatNumber: '22C',
-    },
-    {
-        id: '4',
-        startTime: '09:00 AM',
-        arriveTime: '11:30 AM',
-        startDate: '2024-12-18',
-        arriveDate: '2024-12-18',
-        startDestination: 'Boston (BOS)',
-        arriveDestination: 'Washington D.C. (DCA)',
-        duration: '2h 30m',
-        planeType: 'Boeing 737',
-        price: 180,
-        seatType: 'Business',
-        status: 'Completed',
-        seatNumber: '3D',
-    },
-    {
-        id: '5',
-        startTime: '07:00 AM',
-        arriveTime: '09:00 AM',
-        startDate: '2024-12-19',
-        arriveDate: '2024-12-19',
-        startDestination: 'Houston (IAH)',
-        arriveDestination: 'Denver (DEN)',
-        duration: '2h 00m',
-        planeType: 'Airbus A320',
-        price: 220,
-        seatType: 'Economy',
-        status: 'Booked',
-        seatNumber: '15E',
-    }
-];
-
 const ManageBookings = () => {
-    const [ticketList, setTicketList] = useState<Ticket[]>(TicketList);
+    const [ticketList, setTicketList] = useState<Ticket[]>([]);
+    const router = useRouter();
+    const [error, setError] = useState<string | null>(null);
 
-    const executeCheckin = (id: string) => {
+    useEffect(() => {
+        const checkAuthentication = () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                router.push('/home');
+            }
+        }
+        const fetchBookings = async () => {
+            if (localStorage.getItem('userid') !== null) {
+                const userID = localStorage.getItem('userid');
+                try {
+                    const response = await fetch('http://localhost:3001/api/Flights/GetUserFlights', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ userID }),
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        setTicketList(data);
+                    } else {
+                        console.error('Failed to fetch bookings:', data);
+                    }
+                } catch (error) {
+                    console.error('Error fetching bookings:', error);
+                }
+            }
+        };
+        checkAuthentication()
+        fetchBookings();
+    }, []);
+
+    const executeCheckin = (id: number) => {
         setTicketList(ticketList.map(ticket =>
-            ticket.id === id ? { ...ticket, status: 'Checked-in' } : ticket
+            ticket.BookingID === id ? { ...ticket, BookingStatus: 'checked-in' } : ticket
         ));
         alert('Check-in successful!');
     }
-    const executeCancel = (id: string) => {
+
+    const executeCancel = (id: number) => {
         setTicketList(ticketList.map(ticket =>
-            ticket.id === id ? { ...ticket, status: 'Cancelled' } : ticket
+            ticket.BookingID === id ? { ...ticket, BookingStatus: 'cancelled' } : ticket
         ));
-        // Hide the cancelled ticket
-        setTicketList(ticketList.filter(ticket => ticket.id !== id));
         alert('Booking cancelled!');
     }
+
     return (
         <div className={style.container}>
             <h1 className={style.title}>My Booking</h1>
             <ul className={style.ticketlist}>
                 {ticketList.map((ticket) => (
-                    <li key={ticket.id} className={style.ticketitem}>
+                    <li key={ticket.BookingID} className={style.ticketitem}>
                         <div className={style.column}>
-                            <strong>{ticket.startDestination}</strong> → <strong>{ticket.arriveDestination}</strong>
+                            <strong>{ticket.Departure}</strong> → <strong>{ticket.Arrival}</strong>
                             <div>
-                                {ticket.startDate} → {ticket.arriveDate}
+                                {ticket.DepartureTime} → {ticket.ArrivalTime}
                             </div>
                         </div>
                         <div className={style.column}>
                             <div>
-                                {ticket.startTime} → {ticket.arriveTime}
+                                Flight duration: {ticket.DepartureTime} → {ticket.ArrivalTime}
                             </div>
                             <div>
-                                Flight duration: {ticket.duration}
-                            </div>
-                            <div>
-                                Plane: {ticket.planeType}
+                                Plane: {ticket.AircraftTypeID}
                             </div>
                         </div>
                         <div className={style.column}>
                             <div>
-                                Status: <strong>{ticket.status}</strong>
+                                Status: <strong>{ticket.BookingStatus}</strong>
                             </div>
                             <div>
-                                Seat: {ticket.seatNumber}
+                                Seat: {ticket.SeatsAvailable}
                             </div>
                             <div>
-                                {ticket.seatType}: ${ticket.price}
+                                Price: ${ticket.Price}
                             </div>
                         </div>
                         <div className={style.column}>
                             <div>
-                                <button className={style.checkinbutton} onClick={() => executeCheckin(ticket.id)}>Check-in</button>
+                                <button className={style.checkinbutton} onClick={() => executeCheckin(ticket.BookingID)}>Check-in</button>
                             </div>
                             <div>
-                                <button className={style.cancelbutton} onClick={() => executeCancel(ticket.id)}>Cancel</button>
+                                <button className={style.cancelbutton} onClick={() => executeCancel(ticket.BookingID)}>Cancel</button>
                             </div>
                         </div>
                     </li>

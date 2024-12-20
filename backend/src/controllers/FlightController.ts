@@ -238,7 +238,7 @@ export const cancelBooking = (req: Request, res: Response): void => {
 };
   //5. Theo dõi thông tin chuyến bay đã đặt của User
 export const getUserFlights = (req: Request, res: Response): void => {
-  const { userID } = req.body;  // Lấy userID từ request body
+  const { userID } = req.body;  // Lấy userID từ query params
   if (!userID) {
     res.status(400).json({ message: 'User ID is required' });
     return;

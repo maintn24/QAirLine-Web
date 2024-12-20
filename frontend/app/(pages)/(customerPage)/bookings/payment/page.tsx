@@ -55,7 +55,7 @@ const PaymentPage = () => {
             if (response.ok) {
                 alert('Purchase successful!' + data.bookingID);
                 console.log(data);
-                router.push('/bookings/search');
+                router.push('/manage-bookings');
             } else {
                 setError(`Purchase failed: ${data.message}`);
             }
