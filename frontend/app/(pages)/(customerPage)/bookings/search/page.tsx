@@ -63,7 +63,7 @@ const FlightBooking: React.FC = () => {
 
     // Xử lý tìm kiếm khi có thay đổi search bar
     useEffect(() => {
-        handleSearch()
+        handleSearch();
     }, [search]);
 
     useEffect(() => {
@@ -92,6 +92,11 @@ const FlightBooking: React.FC = () => {
     };
 
     const toPaymentPage = (flight: Flight) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Please sign in to book a flight');
+            return;
+        }
         router.push(`/bookings/payment?flightID=${flight.FlightID}&departure=${flight.Departure}&arrival=${flight.Arrival}&departureTime=${formatedDate(flight.DepartureTime)}&arrivalTime=${formatedDate(flight.ArrivalTime)}&duration=${calculateFlightDuration(flight.DepartureTime, flight.ArrivalTime)}&price=${flight.Price}&planeType=${flight.AircraftTypeID}`);    }
 
     // Tính thời gian bay
@@ -106,7 +111,7 @@ const FlightBooking: React.FC = () => {
 
     // Định dạng lại datetime
     const formatedDate = (datetime: string) => {
-        return format(new Date(datetime), 'dd/MM/yyyy HH:mm');
+        return format(new Date(datetime), 'HH:mm dd/MM/yyyy');
     };
 
     return (
@@ -132,8 +137,11 @@ const FlightBooking: React.FC = () => {
                             </div>
                         </div>
                         <div className={style.column}>
+                            <div><strong>Seats available</strong></div>
+                            <div><strong>{flight.SeatsAvailable}</strong></div>
+                        </div>
+                        <div className={style.column}>
                             <button onClick={() => toPaymentPage(flight)}>Economy<br />${flight.Price}</button>
-                            <button>Business<br />${flight.Price}</button>
                         </div>
                     </li>
                 ))}

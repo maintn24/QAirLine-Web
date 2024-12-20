@@ -33,7 +33,7 @@ export default function Header() {
   const toBookFlights = () => router.push(`/bookings/search`);
   const toManageBooking = () => {
     if (!userID) {
-      setIsVisible(true);
+      alert("Please sign in to see your bookings.");
     } else {
       router.push(`/manage-bookings`);
     }

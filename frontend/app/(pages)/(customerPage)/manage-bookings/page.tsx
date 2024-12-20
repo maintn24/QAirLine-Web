@@ -3,6 +3,7 @@ import style from "./manage-bookings.module.css";
 import React, { useState, useEffect } from "react";
 import "@/app/global/global.css";
 import {useRouter} from "next/navigation";
+import {format} from "date-fns";
 
 interface Ticket {
     BookingID: number;
@@ -35,11 +36,13 @@ const ManageBookings = () => {
         const fetchBookings = async () => {
             if (localStorage.getItem('userid') !== null) {
                 const userID = localStorage.getItem('userid');
+                const token = localStorage.getItem('token');
                 try {
                     const response = await fetch('http://localhost:3001/api/Flights/GetUserFlights', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Authorization': token ? `Bearer ${token}` : '',
                         },
                         body: JSON.stringify({ userID }),
                     });
@@ -72,6 +75,21 @@ const ManageBookings = () => {
         alert('Booking cancelled!');
     }
 
+    // Tính thời gian bay
+    const calculateFlightDuration = (departureTime: string, arrivalTime: string) => {
+        const departure = new Date(departureTime);
+        const arrival = new Date(arrivalTime);
+        const durationMs = arrival.getTime() - departure.getTime();
+        const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+        const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+        return `${durationHours}h ${durationMinutes}m`;
+    };
+
+    // Định dạng lại datetime
+    const formatedDate = (datetime: string) => {
+        return format(new Date(datetime), 'HH:mm dd/MM/yyyy');
+    };
+
     return (
         <div className={style.container}>
             <h1 className={style.title}>My Booking</h1>
@@ -79,28 +97,28 @@ const ManageBookings = () => {
                 {ticketList.map((ticket) => (
                     <li key={ticket.BookingID} className={style.ticketitem}>
                         <div className={style.column}>
+                            <div><strong>Booking ID: {ticket.BookingID}</strong></div>
+                            <div className={style.smalltext}>Booked at: {formatedDate(ticket.BookingDate)}</div>
+
+                        </div>
+                        <div className={style.column}>
                             <strong>{ticket.Departure}</strong> → <strong>{ticket.Arrival}</strong>
                             <div>
-                                {ticket.DepartureTime} → {ticket.ArrivalTime}
+                                {formatedDate(ticket.DepartureTime)} → {formatedDate(ticket.ArrivalTime)}
+                            </div>
+                            <div className={style.smalltext}>
+                                Flight duration: {calculateFlightDuration(ticket.DepartureTime, ticket.ArrivalTime)}
+                            </div>
+                            <div className={style.smalltext}>
+                                Plane ID: {ticket.AircraftTypeID}
                             </div>
                         </div>
                         <div className={style.column}>
                             <div>
-                                Flight duration: {ticket.DepartureTime} → {ticket.ArrivalTime}
+                                Booking Status: <strong>{ticket.BookingStatus}</strong>
                             </div>
                             <div>
-                                Plane: {ticket.AircraftTypeID}
-                            </div>
-                        </div>
-                        <div className={style.column}>
-                            <div>
-                                Status: <strong>{ticket.BookingStatus}</strong>
-                            </div>
-                            <div>
-                                Seat: {ticket.SeatsAvailable}
-                            </div>
-                            <div>
-                                Price: ${ticket.Price}
+                            Price: ${ticket.Price}
                             </div>
                         </div>
                         <div className={style.column}>
