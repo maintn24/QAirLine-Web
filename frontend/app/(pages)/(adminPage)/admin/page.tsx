@@ -10,6 +10,20 @@ export default function AdminLoginPage(){
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
+    // Hàm decode token và lưu vào localStorage
+    const decodeAndStoreToken = (token: string) => {
+        try {
+            const decoded = jwtDecode<JwtPayload & { role?: string; name?: string; userid?: string }>(token);
+
+            if (decoded) {
+                localStorage.setItem("decodedToken", JSON.stringify(decoded));
+            }
+        } catch (error) {
+            console.error("Error decoding token:", error);
+            localStorage.removeItem("token"); // Xoá token nếu giải mã lỗi
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         localStorage.clear();
         e.preventDefault();
@@ -33,20 +47,32 @@ export default function AdminLoginPage(){
             console.log("Request body:", JSON.stringify({ email, password }));
 
             const data = await response.json();
+            
             if (response.ok) {
-                localStorage.setItem('token', data.token);
-                const decoded = jwtDecode<JwtPayload & { role?: string }>(data.token);
-                alert('Signin successful');
-                router.push('/admin/home');
+                const token = data.token;
+
+                // Lưu token vào localStorage
+                localStorage.setItem("token", token);
+
+                // Gọi hàm decode token và lưu thông tin
+                decodeAndStoreToken(token);
+
+                alert("Signin successful");
+                router.push("/admin/home"); // Điều hướng đến trang home
             } else {
-                console.error('Login error:', data);
-                setError(data.message || 'Login failed. Please try again.');
+                console.error("Login error:", data);
+                setError(data.message || "Login failed. Please try again.");
             }
         } catch (error) {
             setError('Something went wrong. Please try again later.' + error);
         }
     };
 
+    // Check token on page load (optional)
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) decodeAndStoreToken(token); // Decode token nếu đã tồn tại
+    }, []);
 
     return(
         <div className={styles.container}>
