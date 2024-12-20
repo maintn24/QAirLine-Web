@@ -639,49 +639,67 @@ export const addAircraft = (req: Request, res: Response): void => {
   
   //4. Thêm Chuyến bay
   export const addFlight = (req: Request, res: Response): void => {
-    const { AircraftTypeID, Departure, Arrival, DepartureTime, ArrivalTime, Price, SeatsAvailable, Status, UserID } = req.body;
-  
+    const { model, departure, arrival, departureTime, arrivalTime, price, seatsAvailable, status, userID } = req.body;
+
     // Kiểm tra đầu vào
-    if (!AircraftTypeID || !Departure || !Arrival || !DepartureTime || !ArrivalTime || !Price || !SeatsAvailable || !Status || !UserID) {
-      res.status(400).json({ message: 'Missing required fields' });
-      return;
+    if (!model || !departure || !arrival || !departureTime || !arrivalTime || !price || !seatsAvailable || !status || !userID) {
+        res.status(400).json({ message: 'Missing required fields' });
+        return;
     }
-  
+
     // Kiểm tra userID có tồn tại và có phải Admin không
-    checkUserIsAdmin(UserID, (isAdmin, error) => {
-      if (error) {
-        res.status(500).json({ message: 'Error checking user role', error: error.message });
-        return;
-      }
-  
-      if (!isAdmin) {
-        res.status(403).json({ message: 'Permission denied: User does not exist or is not an admin' });
-        return;
-      }
-  
-      // Thêm chuyến bay mới
-      const query = `
-        INSERT INTO Flights (AircraftTypeID, Departure, Arrival, DepartureTime, ArrivalTime, Price, SeatsAvailable, Status) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `;
-  
-      connection.query(
-        query,
-        [AircraftTypeID, Departure, Arrival, DepartureTime, ArrivalTime, Price, SeatsAvailable, Status, UserID],
-        (err, results) => {
-          if (err) {
-            console.error('Error executing query:', err.stack);
-            res.status(500).json({ message: 'Internal Server Error', error: err.message });
+    checkUserIsAdmin(userID, (isAdmin, error) => {
+        if (error) {
+            res.status(500).json({ message: 'Error checking user role', error: error.message });
             return;
-          }
-  
-          const flightID = (results as OkPacket).insertId;
-  
-          res.status(201).json({ message: 'Flight added successfully', flightID });
         }
-      );
+
+        if (!isAdmin) {
+            res.status(403).json({ message: 'Permission denied: User does not exist or is not an admin' });
+            return;
+        }
+
+        // Lấy AircraftTypeID từ model
+        const getAircraftQuery = 'SELECT AircraftID FROM Aircrafts WHERE Model = ?';
+        connection.query(getAircraftQuery, [model], (err, results) => {
+            if (err) {
+                console.error('Error fetching aircraft:', err.stack);
+                res.status(500).json({ message: 'Internal Server Error', error: err.message });
+                return;
+            }
+
+            if ((results as RowDataPacket[]).length === 0) {
+                res.status(404).json({ message: 'Aircraft model not found' });
+                return;
+            }
+
+            const AircraftTypeID = (results as RowDataPacket[])[0].AircraftID;
+
+            // Thêm chuyến bay mới
+            const query = `
+                INSERT INTO Flights (AircraftTypeID, Departure, Arrival, DepartureTime, ArrivalTime, Price, SeatsAvailable, Status) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+
+            connection.query(
+                query,
+                [AircraftTypeID, departure, arrival, departureTime, arrivalTime, price, seatsAvailable, status],
+                (err, results) => {
+                    if (err) {
+                        console.error('Error executing query:', err.stack);
+                        res.status(500).json({ message: 'Internal Server Error', error: err.message });
+                        return;
+                    }
+
+                    const flightID = (results as OkPacket).insertId;
+
+                    res.status(201).json({ message: 'Flight added successfully', flightID });
+                }
+            );
+        });
     });
-  };
+};
+
   
   //5. Xóa chuyến bay
   export const deleteFlight = (req: Request, res: Response): void => {
@@ -980,7 +998,7 @@ export const editFlight = (req: Request, res: Response): void => {
   const {
       userID,
       flightID,
-      aircraftTypeID,
+      model,
       departure,
       arrival,
       departureTime,
@@ -991,9 +1009,9 @@ export const editFlight = (req: Request, res: Response): void => {
   } = req.body;
 
   // Kiểm tra đầu vào
-  if (!userID || !flightID) {
+  if (!userID || !flightID || !model) {
       res.status(400).json({
-          message: 'Missing required fields: userID or flightID',
+          message: 'Missing required fields: userID, flightID, or model',
       });
       return;
   }
@@ -1015,11 +1033,11 @@ export const editFlight = (req: Request, res: Response): void => {
           return;
       }
 
-      // Kiểm tra FlightID có tồn tại không
-      const checkFlightQuery = 'SELECT * FROM Flights WHERE FlightID = ?';
-      connection.query(checkFlightQuery, [flightID], (err, results) => {
+      // Lấy AircraftTypeID từ Model
+      const getAircraftQuery = 'SELECT AircraftID FROM Aircrafts WHERE Model = ?';
+      connection.query(getAircraftQuery, [model], (err, results) => {
           if (err) {
-              console.error('Error checking flight existence:', err.stack);
+              console.error('Error fetching aircraft:', err.stack);
               res.status(500).json({
                   message: 'Internal Server Error',
                   error: err.message,
@@ -1029,60 +1047,79 @@ export const editFlight = (req: Request, res: Response): void => {
 
           if ((results as RowDataPacket[]).length === 0) {
               res.status(404).json({
-                  message: 'Flight not found',
+                  message: 'Aircraft model not found',
               });
               return;
           }
 
-          // Thực hiện cập nhật chuyến bay
-          const updateQuery = `
-              UPDATE Flights 
-              SET 
-                  AircraftTypeID = ?,
-                  Departure = ?,
-                  Arrival = ?,
-                  DepartureTime = ?,
-                  ArrivalTime = ?,
-                  Price = ?,
-                  SeatsAvailable = ?,
-                  Status = ?
-              WHERE FlightID = ?
-          `;
+          const aircraftTypeID = (results as RowDataPacket[])[0].AircraftID;
 
-          connection.query(
-              updateQuery,
-              [
-                  aircraftTypeID,
-                  departure,
-                  arrival,
-                  departureTime,
-                  arrivalTime,
-                  price,
-                  seatsAvailable,
-                  status,
-                  flightID
-              ],
-              (err, results) => {
-                  if (err) {
-                      console.error('Error updating flight:', err.stack);
-                      res.status(500).json({
-                          message: 'Failed to update flight',
-                          error: err.message,
-                      });
-                      return;
-                  }
-
-                  const timestamp = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
-                  res.status(200).json({
-                      message: 'Flight updated successfully',
-                      flightID,
-                      timestamp,
+          // Kiểm tra FlightID có tồn tại không
+          const checkFlightQuery = 'SELECT * FROM Flights WHERE FlightID = ?';
+          connection.query(checkFlightQuery, [flightID], (err, results) => {
+              if (err) {
+                  console.error('Error checking flight existence:', err.stack);
+                  res.status(500).json({
+                      message: 'Internal Server Error',
+                      error: err.message,
                   });
+                  return;
               }
-          );
+
+              if ((results as RowDataPacket[]).length === 0) {
+                  res.status(404).json({
+                      message: 'Flight not found',
+                  });
+                  return;
+              }
+
+              // Thực hiện cập nhật chuyến bay
+              const updateQuery = `
+                  UPDATE Flights 
+                  SET 
+                      AircraftTypeID = ?,
+                      Departure = ?,
+                      Arrival = ?,
+                      DepartureTime = ?,
+                      ArrivalTime = ?,
+                      Price = ?,
+                      SeatsAvailable = ?,
+                      Status = ?
+                  WHERE FlightID = ?
+              `;
+
+              connection.query(
+                  updateQuery,
+                  [
+                      aircraftTypeID,
+                      departure,
+                      arrival,
+                      departureTime,
+                      arrivalTime,
+                      price,
+                      seatsAvailable,
+                      status,
+                      flightID
+                  ],
+                  (err, results) => {
+                      if (err) {
+                          console.error('Error updating flight:', err.stack);
+                          res.status(500).json({
+                              message: 'Failed to update flight',
+                              error: err.message,
+                          });
+                          return;
+                      }
+
+                      const timestamp = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+                      res.status(200).json({
+                          message: 'Flight updated successfully',
+                          flightID,
+                          timestamp,
+                      });
+                  }
+              );
+          });
       });
   });
 };
-
-
-
