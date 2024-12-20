@@ -10,7 +10,7 @@ type FlightFormProps = {
 
 export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProps) {
   const [formData, setFormData] = useState<Partial<Flight>>({
-    FlightID: flight?.FlightID || undefined, // FlightID chỉ tồn tại khi đang chỉnh sửa
+    FlightID: flight?.FlightID || undefined,
     AircraftModel: flight?.AircraftModel || '',
     Departure: flight?.Departure || '',
     Arrival: flight?.Arrival || '',
@@ -20,6 +20,7 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
     SeatsAvailable: flight?.SeatsAvailable || 0,
     Status: flight?.Status || 'Scheduled',
   });
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;

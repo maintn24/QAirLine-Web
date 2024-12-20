@@ -40,57 +40,85 @@ export default function FlightManagement() {
 
   const handleSubmit = async (flight: Partial<Flight>) => {
     try {
-      const userid = getUserID();
-      if (!userid) throw new Error('User not authenticated');
-  
-      if (currentFlight && flight.FlightID) {
-        // Edit flight
-        const response = await fetch('http://localhost:3001/api/Flights/Edit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userid, ...flight }),
-        });
-        const result = await response.json();
-        if (result.message === 'Flight updated successfully') {
-          alert('Flight updated successfully');
-          fetchFlights();
+        const userID = getUserID();
+        if (!userID) throw new Error('User not authenticated');
+
+        let url = '';
+        let method = '';
+        let bodyData = {};
+
+        if (currentFlight && flight.FlightID) {
+            // Chỉnh sửa chuyến bay
+            url = 'http://localhost:3001/api/Flights/Edit';
+            method = 'POST';
+            bodyData = {
+              userID: userID,
+              flightID: flight.FlightID,
+              model: flight.AircraftModel,
+              departure: flight.Departure,
+              arrival: flight.Arrival,
+              departureTime: flight.DepartureTime,
+              arrivalTime: flight.ArrivalTime,
+              price: flight.Price,
+              seatsAvailable: flight.SeatsAvailable,
+              status: flight.Status,
+          };
+        } else {
+            // Thêm mới chuyến bay
+            url = 'http://localhost:3001/api/Flights/Add';
+            method = 'POST';
+
+            const { FlightID, ...newFlightData } = flight; // Loại bỏ FlightID
+            bodyData = {
+                model: newFlightData.AircraftModel,
+                departure: newFlightData.Departure,
+                arrival: newFlightData.Arrival,
+                departureTime: newFlightData.DepartureTime,
+                arrivalTime: newFlightData.ArrivalTime,
+                price: newFlightData.Price,
+                seatsAvailable: newFlightData.SeatsAvailable,
+                status: newFlightData.Status,
+                userID,
+            };
         }
-      } else {
-        // Add new flight
-        const { FlightID, ...newFlightData } = flight; // Loại bỏ FlightID
 
-        // Map lại các key trong newFlightData
-        const mappedData = {
-          model: newFlightData.AircraftModel,
-          departure: newFlightData.Departure,
-          arrival: newFlightData.Arrival,
-          departureTime: newFlightData.DepartureTime,
-          arrivalTime: newFlightData.ArrivalTime,
-          price: newFlightData.Price,
-          seatsAvailable: newFlightData.SeatsAvailable,
-          status: newFlightData.Status,
-          userID: userid,
-        };
-
-        const response = await fetch('http://localhost:3001/api/Flights/Add', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(mappedData),
+        const response = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyData),
         });
-
-        console.log(mappedData);
-
+        console.log(bodyData);
         const result = await response.json();
-        if (result.message === 'Flight added successfully') {
-          alert('Flight added successfully');
-          fetchFlights();
+
+        if (response.ok) {
+            if (result.message) alert(result.message);
+            fetchFlights();
+            setShowForm(false);
+        } else {
+            // Xử lý các lỗi từ backend
+            switch (response.status) {
+                case 400:
+                    alert(`Input error: ${result.message || 'Invalid input data'}`);
+                    break;
+                case 403:
+                    alert(`Permission error: ${result.message || 'You are not authorized to perform this action'}`);
+                    break;
+                case 404:
+                    alert(`Not found: ${result.message || 'Requested resource not found'}`);
+                    break;
+                case 500:
+                    alert(`Server error: ${result.message || 'An unexpected error occurred on the server'}`);
+                    break;
+                default:
+                    alert(`Unexpected error: ${result.message || 'Something went wrong'}`);
+            }
         }
-      }
-      setShowForm(false);
     } catch (error) {
-      console.error('Error submitting flight:', error);
+        console.error('Error submitting flight:', error);
+        alert('An unexpected error occurred. Please try again.');
     }
-  };
+};
+
   
 
   const handleDelete = async (flightID: number) => {
@@ -145,11 +173,18 @@ export default function FlightManagement() {
     fetchFlights();
   }, []);
 
+
+  const handleEdit = (flight: Flight) => {
+    console.log('Editing Flight:', flight); // Debug thông tin chuyến bay
+    setCurrentFlight(flight);
+    setShowForm(true); // Bật form khi chỉnh sửa
+  };
+
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Flight Management</h1>
       <button className={styles.addButton} onClick={handleAdd}>Add Flight</button>
-      <FlightTable flights={flights} onEdit={setCurrentFlight} onDelete={handleDelete} />
+      <FlightTable flights={flights} onEdit={handleEdit} onDelete={handleDelete} />
       {showForm && <FlightForm flight={currentFlight} onClose={() => setShowForm(false)} onSubmit={handleSubmit} />}
     </div>
   );
