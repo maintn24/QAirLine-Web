@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './styles/flightTable.module.css';
-import { Flight } from "../flightObject";
+import { Flight } from '../flightObject';
 
 type FlightTableProps = {
   flights: Flight[];
@@ -13,24 +13,33 @@ export default function FlightTable({ flights, onEdit, onDelete }: FlightTablePr
     <table className={styles.table}>
       <thead>
         <tr>
-          <th>ID</th><th>Aircraft</th><th>Flight Hour</th><th>Departure</th>
-          <th>Arrival</th><th>Seats</th><th>Price</th><th>Status</th><th>Actions</th>
+          <th>ID</th>
+          <th>Aircraft Model</th>
+          <th>Departure</th>
+          <th>Arrival</th>
+          <th>Departure Time</th>
+          <th>Arrival Time</th>
+          <th>Price</th>
+          <th>Seats Available</th>
+          <th>Status</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         {flights.map((flight) => (
-          <tr key={flight.ID}>
-            <td>{flight.ID}</td>
-            <td>{flight.Aircraft}</td>
-            <td>{flight.FlightHour}</td>
+          <tr key={flight.FlightID}>
+            <td>{flight.FlightID}</td>
+            <td>{flight.AircraftModel}</td>
             <td>{flight.Departure}</td>
             <td>{flight.Arrival}</td>
-            <td>{flight.SeatAvailable}</td>
+            <td>{flight.DepartureTime}</td>
+            <td>{flight.ArrivalTime}</td>
             <td>{flight.Price}</td>
+            <td>{flight.SeatsAvailable}</td>
             <td>{flight.Status}</td>
             <td>
-              <button className={styles.button} onClick={() => onEdit(flight)}>Edit</button>
-              <button className={styles.button} onClick={() => onDelete(flight.ID)}>Delete</button>
+              <button className={`${styles.button} ${styles.editButton}` } onClick={() => onEdit(flight)}>Edit</button>
+              <button className={`${styles.button} ${styles.deleteButton}`} onClick={() => onDelete(flight.FlightID)}>Delete</button>
             </td>
           </tr>
         ))}
