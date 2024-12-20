@@ -2,14 +2,11 @@
 .container{
     display: flex;
     justify-content: center; /* Căn giữa theo chiều ngang */
-    flex-direction: column; /* Sắp xếp theo chiều dọc */
-    align-items: center;    /* Căn giữa tất cả các phần tử con */
     margin: auto;
 }
 
 .searchbar {
     display: flex;
-    flex-direction: row;
     margin-bottom: 1.5rem;
 }
 
@@ -38,7 +35,7 @@
 .searchButton {
     margin-left: 5px;
     padding: 8px 10px;
-    background-color: #333333;
+    background-color: var(--foreground);
     color: white;
     border: none;
     border-radius: 5px;
