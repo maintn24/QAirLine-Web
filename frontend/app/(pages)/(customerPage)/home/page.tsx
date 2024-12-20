@@ -25,7 +25,7 @@ export default function Home() {
         setName(localStorage.getItem('name'));
         const fetchLocations = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api//Flights/GetAllFlights');
+                const response = await fetch('http://localhost:3001/api/Flights/GetAllFlights');
                 const data: { Departure: string; Arrival: string }[] = await response.json();
                 const uniqueStartDestinations = Array.from(new Set(data.map(flight => flight.Departure)));
                 const uniqueArriveDestinations = Array.from(new Set(data.map(flight => flight.Arrival)));
@@ -38,7 +38,6 @@ export default function Home() {
                 console.error('Error fetching locations:', error);
             }
         };
-
         fetchLocations();
     }, []);
 
@@ -74,7 +73,6 @@ export default function Home() {
 
           <div className="offers">
               <h1 className="text-center font-bold mb-4 text-lg">----------Offers----------</h1>
-
           </div>
 
           <div className={style.hotDes}>

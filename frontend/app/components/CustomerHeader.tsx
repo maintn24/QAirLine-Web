@@ -31,7 +31,13 @@ export default function Header() {
 
   const toHomePage = () => router.push(`/home`);
   const toBookFlights = () => router.push(`/bookings/search`);
-  const toManageBooking = () => router.push(`/manage-bookings`);
+  const toManageBooking = () => {
+    if (!userID) {
+      alert("Please sign in to see your bookings.");
+    } else {
+      router.push(`/manage-bookings`);
+    }
+  };
   const toOffers = () => router.push(`/offers`);
   const toAbout = () => router.push(`/about`);
 
