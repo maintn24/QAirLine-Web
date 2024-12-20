@@ -288,8 +288,7 @@ export const bookFlight = (req: Request, res: Response): void => {
 };
 
 
-
-//3. Hủy vé
+// 3. Hủy vé
 export const cancelBooking = (req: Request, res: Response): void => {
   const { userID, bookingID } = req.body;
 
@@ -299,7 +298,7 @@ export const cancelBooking = (req: Request, res: Response): void => {
     return;
   }
 
-  // Kiểm tra userID có tồn tại và có phải Admin không
+  // Kiểm tra userID có tồn tại 
   checkUserExists(userID, (isAdmin, error) => {
     if (error) {
       res.status(500).json({ message: 'Error checking user existence', error: error.message });
@@ -341,32 +340,32 @@ export const cancelBooking = (req: Request, res: Response): void => {
           return;
         }
 
-        const flightQuery = 'SELECT * FROM Flights WHERE FlightID = ?';
-        connection.query(flightQuery, [flightID], (err, results) => {
+        // Kiểm tra xem đã tồn tại bản ghi hủy vé hay chưa
+        const checkExistingCancellationQuery = `
+          SELECT * FROM Bookings 
+          WHERE UserID = ? AND FlightID = ? AND BookingStatus = 'cancelled'
+        `;
+        connection.query(checkExistingCancellationQuery, [userID, flightID], (err, results) => {
           if (err) {
-            console.error('Error querying flights:', err);
-            res.status(500).json({ message: 'Internal server error' });
+            console.error('Error checking existing cancellation:', err);
+            res.status(500).json({ message: 'Failed to check existing cancellations' });
             return;
           }
 
-          const flight = (results as RowDataPacket[])[0];
-          const departureTime = new Date(flight.DepartureTime);
-          const currentTime = new Date();
-          const timeDifference = departureTime.getTime() - currentTime.getTime();
-          const MIN_CANCEL_TIME = 2 * 60 * 60 * 1000; // Tối thiếu 2 giờ trước khi cất cánh
-
-          // Kiểm tra thời gian hủy vé
-          if (timeDifference < MIN_CANCEL_TIME) {
-            res.status(400).json({ message: 'Cannot cancel booking, less than 2 hours before flight' });
+          if ((results as RowDataPacket[]).length > 0) {
+            res.status(400).json({ message: 'Booking has already been cancelled for this flight and user' });
             return;
           }
 
-          // Update trạng thái thành "cancelled"
-          const cancelBookingQuery = 'UPDATE Bookings SET BookingStatus = "cancelled" WHERE BookingID = ?';
-          connection.query(cancelBookingQuery, [bookingID], (err, results) => {
+          // Tạo bản ghi mới với BookingID mới
+          const insertNewBookingQuery = `
+            INSERT INTO Bookings (UserID, FlightID, BookingStatus, PaymentStatus, BookingDate) 
+            VALUES (?, ?, 'cancelled', 'unpaid', NOW())
+          `;
+          connection.query(insertNewBookingQuery, [userID, flightID], (err, results) => {
             if (err) {
-              console.error('Error canceling booking:', err);
-              res.status(500).json({ message: 'Failed to cancel booking' });
+              console.error('Error creating new booking:', err);
+              res.status(500).json({ message: 'Failed to create new booking record' });
               return;
             }
 
@@ -383,7 +382,7 @@ export const cancelBooking = (req: Request, res: Response): void => {
 
               // Trả về thông báo thành công
               res.status(200).json({ 
-                message: 'Booking cancelled successfully',
+                message: 'Booking cancelled successfully with a new record',
                 timestamp
               });
             });
@@ -393,6 +392,9 @@ export const cancelBooking = (req: Request, res: Response): void => {
     });
   });
 };
+
+
+
 
   //4. Theo dõi thông tin chuyến bay đã đặt 
   export const getUserFlights = (req: Request, res: Response): void => {
@@ -417,11 +419,13 @@ export const cancelBooking = (req: Request, res: Response): void => {
       // Truy vấn thông tin chuyến bay đã đặt
       const query = `
         SELECT 
-          b.BookingID, b.BookingDate, b.BookingStatus, b.PaymentStatus, 
-          f.FlightID, f.AircraftTypeID, f.Departure, f.Arrival, f.DepartureTime, f.ArrivalTime, f.Price, f.SeatsAvailable, f.Status AS FlightStatus
-        FROM Bookings b
-        JOIN Flights f ON b.FlightID = f.FlightID
-        WHERE b.UserID = ?
+        b.BookingID, b.BookingDate, b.BookingStatus, b.PaymentStatus, 
+        f.FlightID, f.Departure, f.Arrival, f.DepartureTime, f.ArrivalTime, f.Price, f.SeatsAvailable, f.Status AS FlightStatus,
+        a.Model AS AircraftModel
+      FROM Bookings b
+      JOIN Flights f ON b.FlightID = f.FlightID
+      JOIN Aircrafts a ON f.AircraftTypeID = a.AircraftID
+      WHERE b.UserID = ?
       `;
       connection.query(query, [userID], (err, results) => {
         if (err) {
@@ -772,68 +776,86 @@ export const addAircraft = (req: Request, res: Response): void => {
   
   // 6. Chức năng xem và thống kê đặt vé của tất cả khách hàng
   export const viewAndSummarizeBookings = (req: Request, res: Response): void => {
-    const { userID } = req.body;
-  
-    // Kiểm tra UserID có được gửi hay không
-    if (!userID) {
-      res.status(400).json({ message: 'UserID is required' });
+  const { userID } = req.body;
+
+  // Kiểm tra UserID có được gửi hay không
+  if (!userID) {
+    res.status(400).json({ message: 'UserID is required' });
+    return;
+  }
+
+  // Kiểm tra xem UserID có phải là Admin hoặc tồn tại hay không
+  checkUserIsAdmin(userID, (isAdmin, error) => {
+    if (error) {
+      res.status(500).json({
+        message: 'Error checking user role',
+        error: error.message,
+      });
       return;
     }
-  
-    //Kiểm tra xem UserID có phải là Admin hoặc tồn tại hay không ?
-    checkUserIsAdmin(userID, (isAdmin, error) => {
-      if (error) {
-        res.status(500).json({
-          message: 'Error checking user role',
-          error: error.message,
-        });
+
+    if (!isAdmin) {
+      res.status(403).json({
+        message: 'Permission denied: User does not exist or is not an admin',
+      });
+      return;
+    }
+
+    // Truy vấn lấy thống kê đặt vé, bao gồm BookingDate
+    const bookingQuery = `
+      SELECT 
+        b.BookingID, 
+        b.UserID, 
+        u.Name AS UserName, 
+        b.BookingDate, 
+        f.FlightID, 
+        f.Departure, 
+        f.Arrival, 
+        f.DepartureTime, 
+        f.ArrivalTime, 
+        f.Price
+      FROM Bookings b
+      JOIN Users u ON b.UserID = u.UserID
+      JOIN Flights f ON b.FlightID = f.FlightID
+      ORDER BY b.BookingID DESC
+    `;
+
+    connection.query(bookingQuery, (err, results: RowDataPacket[]) => {
+      if (err) {
+        console.error('Error fetching booking statistics:', err);
+        res.status(500).json({ message: 'Failed to fetch booking statistics' });
         return;
       }
-  
-      if (!isAdmin) {
-        res.status(403).json({
-          message: 'Permission denied: User does not exist or is not an admin',
-        });
-        return;
-      }
-  
-      //Truy vấn lấy thống kê đặt vé
-      const bookingQuery = `
-        SELECT 
-          b.BookingID, 
-          b.UserID, 
-          u.Name AS UserName, 
-          f.FlightID, 
-          f.Departure, 
-          f.Arrival, 
-          f.DepartureTime, 
-          f.ArrivalTime, 
-          f.Price
-        FROM Bookings b
-        JOIN Users u ON b.UserID = u.UserID
-        JOIN Flights f ON b.FlightID = f.FlightID
-        ORDER BY b.BookingID DESC
-      `;
-  
-      connection.query(bookingQuery, (err, results: RowDataPacket[]) => {
-        if (err) {
-          console.error('Error fetching booking statistics:', err);
-          res.status(500).json({ message: 'Failed to fetch booking statistics' });
-          return;
-        }
-  
-        const timestamp = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
-  
-        // Trả về kết quả
-        res.status(200).json({
-          message: 'Booking statistics retrieved successfully',
-          totalBookings: results.length,
-          timestamp,
-          bookings: results,
-        });
+
+      const timestamp = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+
+      // Trả về kết quả
+      res.status(200).json({
+        message: 'Booking statistics retrieved successfully',
+        totalBookings: results.length,
+        bookings: results.map(booking => ({
+          BookingID: booking.BookingID,
+          UserID: booking.UserID,
+          UserName: booking.UserName,
+          BookingDate: new Date(booking.BookingDate).toLocaleString('vi-VN', {
+            timeZone: 'Asia/Ho_Chi_Minh',
+          }),
+          FlightID: booking.FlightID,
+          Departure: booking.Departure,
+          Arrival: booking.Arrival,
+          DepartureTime: new Date(booking.DepartureTime).toLocaleString('vi-VN', {
+            timeZone: 'Asia/Ho_Chi_Minh',
+          }),
+          ArrivalTime: new Date(booking.ArrivalTime).toLocaleString('vi-VN', {
+            timeZone: 'Asia/Ho_Chi_Minh',
+          }),
+          Price: booking.Price,
+        })),
       });
     });
-  };
+  });
+};
+
   
 
 // 7.Lấy thông tin tất cả tàu bay

@@ -17,7 +17,7 @@ const router = express.Router();
     router.post('/Bookings/BookFlights', bookFlight);
     // Hủy vé trong thời hạn được hủy
     router.post('/Bookings/CancelBooking', cancelBooking);
-    // Hiện thông tin chuyến bay của User
+    // Theo dõi thông tin chuyến bay của User
     router.post('/Flights/GetUserFlights', getUserFlights);
     // Đăng ký
     router.post('/auth/signup',signUp);
