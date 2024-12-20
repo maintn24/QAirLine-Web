@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import { useRouter } from "next/navigation";
 import {jwtDecode, JwtPayload} from "jwt-decode";
 
-export default function AdminLoginPage(){
+function AdminLoginPage(){
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [error, setError] = useState<string | null>(null);
@@ -117,3 +117,5 @@ export default function AdminLoginPage(){
         </div>
     )
 }
+
+export default AdminLoginPage;
