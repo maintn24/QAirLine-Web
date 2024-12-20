@@ -1,6 +1,7 @@
 'use client'
 import style from "./homepage.module.css";
 import React, {useEffect, useState} from "react";
+import { useRouter } from "next/router";
 import {jwtDecode, JwtPayload} from "jwt-decode";
 import "@/app/global/global.css";
 import SearchBar from "@/app/components/SearchBar";
@@ -42,6 +43,34 @@ export default function Home() {
     }, []);
 
 
+    const [offers, setOffers] = useState<any[]>([]); // State lưu offers từ API
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchOffers = async () => {
+        try {
+            const response = await fetch('http://localhost:3001/api/Offers/GetAllOffers');
+            if (!response.ok) {
+            throw new Error('Failed to fetch offers');
+            }
+            const data = await response.json();
+            const formattedOffers = data.map((offer: any) => ({
+            id: offer.PostID,
+            title: offer.Title,
+            description: offer.Content,
+            postDate: offer.PostDate,
+            }));
+            setOffers(formattedOffers);
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+        };
+
+        fetchOffers();
+    }, []);
 
     const handleInputChange = (e: any) => {
         const { name, value } = e.target;
@@ -51,6 +80,10 @@ export default function Home() {
     const handleSearch = () => {
         console.log(search);
     };
+
+    // const handleViewMore = () => {
+    //     router.push('/offers'); // Điều hướng đến trang /offers
+    //   };
 
   return (
       <main>
@@ -71,9 +104,28 @@ export default function Home() {
               />
           </div>
 
-          <div className="offers">
-              <h1 className="text-center font-bold mb-4 text-lg">----------Offers----------</h1>
-          </div>
+          <div className={style.offers}>
+            <h1 className="text-center font-bold mb-4 text-lg">----------Offers----------</h1>
+            <div className={style.offerGrid}>
+            {loading ? (
+                <p>Loading offers...</p>
+            ) : error ? (
+                <p>{error}</p>
+            ) : (
+                offers.slice(0, 3).map((offer) => (
+                <div key={offer.id} className={style.offerCard}>
+                    <img src="./Offer_Image/Offer_Noti.png" alt={offer.title} className={style.offerImage} />
+                    <div className={style.offerTitle}>{offer.title}</div>
+                </div>
+                ))
+            )}
+            </div>
+            <div className="text-center mt-4">
+            <button className="viewMoreButton">
+                Xem thêm <span>&#8594;</span>
+            </button>
+            </div>
+        </div>
 
           <div className={style.hotDes}>
               <h1 className="text-center font-bold mb-4 text-lg">----------Hot Destination----------</h1>
