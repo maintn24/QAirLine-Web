@@ -1,8 +1,8 @@
 export type Aircraft = {
-  ID: number;
+  AircraftID: number;
   Model: string;
-  Manufacture: string;
+  Manufacturer: string;
   Capacity: number;
-  Range: number;
+  RangeKm: number;
   Description: string;
 };
