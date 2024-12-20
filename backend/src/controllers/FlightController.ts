@@ -708,7 +708,6 @@ export const addAircraft = (req: Request, res: Response): void => {
   //5. Xóa chuyến bay
   export const deleteFlight = (req: Request, res: Response): void => {
     const { flightID, UserID } = req.body;
-  
     // Kiểm tra đầu vào
     if (!flightID || !UserID) {
       res.status(400).json({ message: 'Missing required fields: flightID or UserID' });

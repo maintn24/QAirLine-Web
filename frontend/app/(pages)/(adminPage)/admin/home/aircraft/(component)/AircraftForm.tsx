@@ -8,84 +8,83 @@ type AircraftFormProps = {
     onSubmit: (aircraft: Aircraft) => void;
 };
 
-export default function AircraftForm({aircraft, onClose, onSubmit}: AircraftFormProps){
+export default function AircraftForm({ aircraft, onClose, onSubmit }: AircraftFormProps) {
     const [formData, setFormData] = useState<Aircraft>({
-        ID: aircraft?.ID || Date.now(),
+        AircraftID: aircraft?.AircraftID || Date.now(),
         Model: aircraft?.Model || '',
-        Manufacture: aircraft?.Manufacture || '',
+        Manufacturer: aircraft?.Manufacturer || '',
         Capacity: aircraft?.Capacity || 0,
-        Range: aircraft?.Range || 0,
+        RangeKm: aircraft?.RangeKm || 0,
         Description: aircraft?.Description || '',
-    })
+    });
 
-    const handleChange = (e:React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
-        const {name, value} = e.target;
-        setFormData({...formData, [name]: value});
-    }
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSubmit(formData); // Gửi dữ liệu lên page chính
-      };
-      
+        onSubmit(formData); // Pass data back to page
+    };
 
-    return(
+    return (
         <div className={styles.overlay}>
             <div className={styles.formContainer}>
-                <h2 className={styles.title}>{aircraft?'Edit Aircraft':'Add Aircraft'}</h2>
+                <h2 className={styles.title}>{aircraft ? 'Edit Aircraft' : 'Add Aircraft'}</h2>
                 <form onSubmit={handleSubmit}>
                     <label>
                         Model:
-                        <input 
-                            type='text' 
-                            name='Model' 
-                            value={formData.Model} 
-                            onChange={handleChange} 
+                        <input
+                            type='text'
+                            name='Model'
+                            value={formData.Model}
+                            onChange={handleChange}
                             className={styles.inputField}
                             required
                         />
                     </label>
                     <label>
-                        Manufacture:
-                        <input 
-                            type="text" 
-                            name="Manufacture" 
-                            value={formData.Manufacture} 
-                            onChange={handleChange} 
+                        Manufacturer:
+                        <input
+                            type="text"
+                            name="Manufacturer"
+                            value={formData.Manufacturer}
+                            onChange={handleChange}
                             className={styles.inputField}
-                            required 
+                            required
                         />
                     </label>
                     <label>
                         Capacity:
-                        <input 
-                            type="number" 
-                            name="Capacity" 
-                            value={formData.Capacity} 
+                        <input
+                            type="number"
+                            name="Capacity"
+                            value={formData.Capacity}
                             onChange={handleChange}
                             className={styles.inputField}
-                            required 
+                            required
                         />
                     </label>
                     <label>
                         Range:
-                        <input 
-                            type="number" 
-                            name="Range" 
-                            value={formData.Range} 
-                            onChange={handleChange} 
+                        <input
+                            type="number"
+                            name="RangeKm"
+                            value={formData.RangeKm}
+                            onChange={handleChange}
                             className={styles.inputField}
-                            required 
+                            required
                         />
                     </label>
                     <label>
                         Description:
-                        <textarea 
-                            name="Description" 
-                            value={formData.Description} 
+                        <textarea
+                            name="Description"
+                            value={formData.Description}
                             onChange={handleChange}
-                            className={styles.inputField} 
-                            required 
+                            className={styles.inputField}
+                            required
                         />
                     </label>
                     <div className={styles.buttons}>
@@ -95,5 +94,5 @@ export default function AircraftForm({aircraft, onClose, onSubmit}: AircraftForm
                 </form>
             </div>
         </div>
-    )
+    );
 }

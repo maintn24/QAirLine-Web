@@ -1,16 +1,15 @@
 import React from "react";
 import styles from './styles/aircraftTable.module.css';
-import { Chocolate_Classical_Sans } from "next/font/google";
 import { Aircraft } from "../aircraftObject";
 
-type aircraftTableProps = {
+type AircraftTableProps = {
     aircrafts: Aircraft[];
     onEdit: (aircraft: Aircraft) => void;
-    onDelete: (id:number) => void;
-}
+    onDelete: (id: number) => void;
+};
 
-export default function AircraftTable({aircrafts, onEdit, onDelete}: aircraftTableProps){
-    return(
+export default function AircraftTable({ aircrafts, onEdit, onDelete }: AircraftTableProps) {
+    return (
         <table className={styles.table}>
             <thead>
                 <tr>
@@ -25,20 +24,20 @@ export default function AircraftTable({aircrafts, onEdit, onDelete}: aircraftTab
             </thead>
             <tbody>
                 {aircrafts.map((aircraft) => (
-                    <tr key={aircraft.ID}>
-                        <td>{aircraft.ID}</td>
+                    <tr key={aircraft.AircraftID}>
+                        <td>{aircraft.AircraftID}</td>
                         <td>{aircraft.Model}</td>
-                        <td>{aircraft.Manufacture}</td>
+                        <td>{aircraft.Manufacturer}</td>
                         <td>{aircraft.Capacity}</td>
-                        <td>{aircraft.Range}</td>
+                        <td>{aircraft.RangeKm}</td>
                         <td>{aircraft.Description}</td>
                         <td>
-                            <button onClick={()=> onEdit(aircraft)} className={styles.editButton}>Edit</button>
-                            <button onClick={()=> onDelete(aircraft.ID)} className={styles.deleteButton}>Delete</button>
+                            <button onClick={() => onEdit(aircraft)} className={styles.editButton}>Edit</button>
+                            <button onClick={() => onDelete(aircraft.AircraftID)} className={styles.deleteButton}>Delete</button>
                         </td>
                     </tr>
-                ) )}
+                ))}
             </tbody>
         </table>
-    )
+    );
 }
