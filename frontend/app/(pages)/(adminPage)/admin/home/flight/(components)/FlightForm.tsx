@@ -1,117 +1,138 @@
-import React, { useState } from "react";
-import styles from "./styles/flightForm.module.css";
-import { Flight } from "../flightObject";
+import React, { useState } from 'react';
+import styles from './styles/flightForm.module.css';
+import { Flight } from '../flightObject';
 
 type FlightFormProps = {
-  flight: Flight | null;
+  flight: Flight | null; // Nếu là null, form sẽ dùng để thêm mới
   onClose: () => void;
-  onSubmit: (flight: Flight) => void;
+  onSubmit: (flight: Partial<Flight>) => void; // Dùng Partial để chấp nhận thiếu FlightID khi thêm mới
 };
 
 export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProps) {
-  const [formData, setFormData] = useState<Flight>({
-    ID: flight?.ID || Date.now(),
-    Aircraft: flight?.Aircraft || "",
-    FlightHour: flight?.FlightHour || "",
-    Departure: flight?.Departure || "",
-    Arrival: flight?.Arrival || "",
-    SeatAvailable: flight?.SeatAvailable || 0,
+  const [formData, setFormData] = useState<Partial<Flight>>({
+    FlightID: flight?.FlightID || undefined, // FlightID chỉ tồn tại khi đang chỉnh sửa
+    AircraftModel: flight?.AircraftModel || '',
+    Departure: flight?.Departure || '',
+    Arrival: flight?.Arrival || '',
+    DepartureTime: flight?.DepartureTime || '',
+    ArrivalTime: flight?.ArrivalTime || '',
     Price: flight?.Price || 0,
-    Status: flight?.Status || "Scheduled",
+    SeatsAvailable: flight?.SeatsAvailable || 0,
+    Status: flight?.Status || 'Scheduled',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({
+      ...formData,
+      [name]: name === 'Price' || name === 'SeatsAvailable' ? Number(value) : value,
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData); // Gửi dữ liệu lên page chính
+    onSubmit(formData);
   };
-  
 
   return (
     <div className={styles.overlay}>
       <div className={styles.formContainer}>
-        <h2 className={styles.title}>{flight ? "Edit Flight" : "Add Flight"}</h2>
+        <h2 className={styles.title}>{flight ? 'Edit Flight' : 'Add Flight'}</h2>
         <form onSubmit={handleSubmit}>
-          <label className={styles.label}>
-            Aircraft:
+          {flight && (
+            <div className={`${styles.formGroup} ${styles.inputField}`}>
+              <label htmlFor="FlightID">Flight ID</label>
+              <input type="text" id="FlightID" name="FlightID" value={formData.FlightID} disabled />
+            </div>
+          )}
+          <div className={`${styles.formGroup} ${styles.inputField}`}>
+            <label htmlFor="AircraftModel">Aircraft Model</label>
             <input
               type="text"
-              name="Aircraft"
-              value={formData.Aircraft}
+              id="AircraftModel"
+              name="AircraftModel"
+              value={formData.AircraftModel}
               onChange={handleChange}
-              className={styles.input}
               required
             />
-          </label>
-          <label className={styles.label}>
-            Flight Hour:
-            <input
-              type="number"
-              name="FlightHour"
-              value={formData.FlightHour}
-              onChange={handleChange}
-              className={styles.input}
-              required
-            />
-          </label>
-          <label className={styles.label}>
-            Departure:
+          </div>
+          <div className={`${styles.formGroup} ${styles.inputField}`}>
+            <label htmlFor="Departure">Departure</label>
             <input
               type="text"
+              id="Departure"
               name="Departure"
               value={formData.Departure}
               onChange={handleChange}
-              className={styles.input}
               required
             />
-          </label>
-          <label className={styles.label}>
-            Arrival:
+          </div>
+          <div className={`${styles.formGroup} ${styles.inputField}`}>
+            <label htmlFor="Arrival">Arrival</label>
             <input
               type="text"
+              id="Arrival"
               name="Arrival"
               value={formData.Arrival}
               onChange={handleChange}
-              className={styles.input}
               required
             />
-          </label>
-          <label className={styles.label}>
-            Seat Available:
+          </div>
+          <div className={`${styles.formGroup} ${styles.inputField}`}>
+            <label htmlFor="DepartureTime">Departure Time</label>
             <input
-              type="number"
-              name="SeatAvailable"
-              value={formData.SeatAvailable}
+              type="text"
+              id="DepartureTime"
+              name="DepartureTime"
+              value={formData.DepartureTime}
               onChange={handleChange}
-              className={styles.input}
               required
             />
-          </label>
-          <label className={styles.label}>
-            Price:
+          </div>
+          <div className={`${styles.formGroup} ${styles.inputField}`}>
+            <label htmlFor="ArrivalTime">Arrival Time</label>
+            <input
+              type="text"
+              id="ArrivalTime"
+              name="ArrivalTime"
+              value={formData.ArrivalTime}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className={`${styles.formGroup} ${styles.inputField}`}>
+            <label htmlFor="Price">Price</label>
             <input
               type="number"
+              id="Price"
               name="Price"
               value={formData.Price}
               onChange={handleChange}
-              className={styles.input}
               required
             />
-          </label>
-          <label className={styles.label}>
-            Status:
-            <textarea
+          </div>
+          <div className={`${styles.formGroup} ${styles.inputField}`}>
+            <label htmlFor="SeatsAvailable">Seats Available</label>
+            <input
+              type="number"
+              id="SeatsAvailable"
+              name="SeatsAvailable"
+              value={formData.SeatsAvailable}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className={`${styles.formGroup} ${styles.inputField}`}>
+            <label htmlFor="Status">Status</label>
+            <input
+              type="text"
+              id="Status"
               name="Status"
               value={formData.Status}
               onChange={handleChange}
-              className={styles.textarea}
               required
             />
-          </label>
+          </div>
           <div className={styles.buttonGroup}>
             <button type="button" onClick={onClose} className={styles.cancelButton}>
               Cancel

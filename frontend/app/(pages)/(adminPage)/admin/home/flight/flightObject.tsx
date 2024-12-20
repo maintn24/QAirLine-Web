@@ -1,11 +1,11 @@
 export type Flight = {
-    ID: number;
-    Aircraft: string;
-    FlightHour: string; // Giữ kiểu đồng nhất
-    Departure: string;
-    Arrival: string;
-    SeatAvailable: number;
-    Price: number;
-    Status: string;
-  };
-  
+  FlightID: number;
+  AircraftModel: string;
+  Departure: string;
+  Arrival: string;
+  DepartureTime: string;
+  ArrivalTime: string;
+  Price: number;
+  SeatsAvailable: number;
+  Status: string;
+};
