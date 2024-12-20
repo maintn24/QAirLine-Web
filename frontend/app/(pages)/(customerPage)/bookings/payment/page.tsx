@@ -6,10 +6,10 @@ import style from './payment.module.css';
 const PaymentPage = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const [userID, setUserID] = useState<string | null>(null);
+    const [UserID, setUserID] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    const flightID = searchParams.get('flightID');
+    const FlightID = searchParams.get('flightID');
     const departure = searchParams.get('departure');
     const arrival = searchParams.get('arrival');
     const departureTime = searchParams.get('departureTime');
@@ -19,21 +19,24 @@ const PaymentPage = () => {
     const planeType = searchParams.get('planeType')
 
     useEffect(() => {
-        const userID = localStorage.getItem('userid');
-        if (userID == null) {
-            router.push('/home'); // Redirect to home page if user is not logged in
-            return;
+        setUserID(localStorage.getItem('userid'));
+        const checkAuthentication = () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                router.push('/home');
+            }
         }
-        setUserID(userID);
-        console.log('User ID:', userID);
+        checkAuthentication()
     }, []);
 
     const handlePurchase = async () => {
         alert('Purchase button clicked');
+        console.log('Payment Flight ID:', FlightID);
+        console.log('Payment User ID:', UserID);
         // Reset error state
         setError(null);
 
-        if (!userID || !flightID) {
+        if (!UserID || !FlightID) {
             alert('User ID or Flight ID is missing');
             return;
         }
@@ -44,7 +47,7 @@ const PaymentPage = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({userID, flightID}),
+                body: JSON.stringify({UserID, FlightID}),
             });
 
             const data = await response.json();
