@@ -7,6 +7,7 @@
 import styles from '@/app/(pages)/(customerPage)/offers/[id]/offerDetailPage.module.css';
 import { useSearchParams } from 'next/navigation';
 import {Suspense} from "react";
+import {format} from "date-fns";
 
 
 const OfferDetailPage = () => { //{ offer }: { offer: { id: number; title: string; description: string } }
@@ -15,10 +16,14 @@ const OfferDetailPage = () => { //{ offer }: { offer: { id: number; title: strin
   const description = searchParams.get('description');
   const postDate = searchParams.get('postDate');
 
+    const formatedDate = (datetime: string) => {
+        return format(new Date(datetime), 'HH:mm dd/MM/yyyy');
+    };
+
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>{title}</h1>
-      <p className={styles.postDate}>Posted on: {postDate}</p>
+      <p className={styles.postDate}>Posted on: {formatedDate(postDate as string)}</p>
       <hr className={styles.divider} />
       <p className={styles.description}>{description}</p>
     </div>

@@ -19,13 +19,13 @@ const PaymentPage = () => {
     const planeType = searchParams.get('planeType')
 
     useEffect(() => {
-        setUserID(localStorage.getItem('userid'));
         const checkAuthentication = () => {
             const token = localStorage.getItem('token');
             if (!token) {
                 router.push('/home');
             }
         }
+        setUserID(localStorage.getItem('userid'));
         checkAuthentication()
     }, []);
 
@@ -42,10 +42,12 @@ const PaymentPage = () => {
         }
 
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch('http://localhost:3001/api/Bookings/BookFlights', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : '',
                 },
                 body: JSON.stringify({UserID, FlightID}),
             });
@@ -55,7 +57,7 @@ const PaymentPage = () => {
             if (response.ok) {
                 alert('Purchase successful!' + data.bookingID);
                 console.log(data);
-                router.push('/bookings/search');
+                router.push('/manage-bookings');
             } else {
                 setError(`Purchase failed: ${data.message}`);
             }
