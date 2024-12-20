@@ -29,14 +29,17 @@ export default function AdminLoginPage(){
                 },
                 body: JSON.stringify({ email, password }),
             });
+
+            console.log("Request body:", JSON.stringify({ email, password }));
+
             const data = await response.json();
             if (response.ok) {
                 localStorage.setItem('token', data.token);
                 const decoded = jwtDecode<JwtPayload & { role?: string }>(data.token);
                 alert('Signin successful');
                 router.push('/admin/home');
-
             } else {
+                console.error('Login error:', data);
                 setError(data.message || 'Login failed. Please try again.');
             }
         } catch (error) {

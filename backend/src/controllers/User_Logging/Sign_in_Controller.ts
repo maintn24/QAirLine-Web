@@ -20,7 +20,6 @@ export const signIn = (req: Request, res: Response) => {
 
     const user = rows[0];
 
-    // Kiểm tra mật khẩu với bcrypt
     bcrypt.compare(password, user.Password, (err, isMatch) => {
       if (err) {
         console.error('Error comparing passwords:', err);
@@ -30,20 +29,25 @@ export const signIn = (req: Request, res: Response) => {
       if (!isMatch) {
         return res.status(401).json({ message: 'Invalid email or password' });
       }
-    });
 
+      // Nếu mật khẩu khớp, tạo JWT token
+      const token = jwt.sign(
+        {
+          userid: user.UserID,
+          email: user.Email,
+          username: user.Username,
+          name: user.Name,
+          role: user.Role,
+        },
+        'secret_key', // Đổi 'secret_key' thành biến môi trường trong thực tế
+        { expiresIn: '1h' }
+      );
 
-      // Tạo JWT token
-    const token = jwt.sign(
-      { userid: user.UserID, email: user.Email, username: user.Username, name: user.Name, role: user.Role },  // Chuyển Username thành Email trong token
-      'secret_key',  // Secret key (nên lấy từ môi trường)
-      { expiresIn: '1h' }
-    );
-
-    // Trả về token
-    res.json({
-      message: 'Sign in successful',
-      token,
+      // Gửi phản hồi token
+      return res.json({
+        message: 'Sign in successful',
+        token,
+      });
     });
   });
 };
