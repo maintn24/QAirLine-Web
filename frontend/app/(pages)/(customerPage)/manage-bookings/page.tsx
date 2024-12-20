@@ -61,18 +61,38 @@ const ManageBookings = () => {
         fetchBookings();
     }, []);
 
-    const executeCheckin = (id: number) => {
-        setTicketList(ticketList.map(ticket =>
-            ticket.BookingID === id ? { ...ticket, BookingStatus: 'checked-in' } : ticket
-        ));
-        alert('Check-in successful!');
+    const cancelBooking = async (bookingID: number) => {
+        const userID = localStorage.getItem('userid');
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch('http://localhost:3001/api/Bookings/CancelBooking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : '',
+                },
+                body: JSON.stringify({ bookingID, userID }),
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setTicketList(ticketList.map(ticket =>
+                    ticket.BookingID === bookingID ? { ...ticket, BookingStatus: 'cancelled' } : ticket
+                ));
+                alert('Booking cancelled!');
+            } else {
+                console.error('Failed to cancel booking:', data);
+            }
+        } catch (error) {
+            console.error('Error cancelling booking:', error);
+        }
+    }
+
+    const executeCheckin = (id: number, message: string) => {
+        alert('Flight status: ' + message);
     }
 
     const executeCancel = (id: number) => {
-        setTicketList(ticketList.map(ticket =>
-            ticket.BookingID === id ? { ...ticket, BookingStatus: 'cancelled' } : ticket
-        ));
-        alert('Booking cancelled!');
+        cancelBooking(id);
     }
 
     // Tính thời gian bay
@@ -115,15 +135,16 @@ const ManageBookings = () => {
                         </div>
                         <div className={style.column}>
                             <div>
-                                Booking Status: <strong>{ticket.BookingStatus}</strong>
+                                Booking Status
                             </div>
+                            <div><strong>{ticket.BookingStatus}</strong></div>
                             <div>
-                            Price: ${ticket.Price}
+                                Price: ${ticket.Price}
                             </div>
                         </div>
                         <div className={style.column}>
                             <div>
-                                <button className={style.checkinbutton} onClick={() => executeCheckin(ticket.BookingID)}>Check-in</button>
+                                <button className={style.checkinbutton} onClick={() => executeCheckin(ticket.BookingID, ticket.FlightStatus)}>Check-in</button>
                             </div>
                             <div>
                                 <button className={style.cancelbutton} onClick={() => executeCancel(ticket.BookingID)}>Cancel</button>

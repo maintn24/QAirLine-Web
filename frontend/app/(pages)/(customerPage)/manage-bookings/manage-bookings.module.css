@@ -43,7 +43,7 @@
 }
 
 .ticketitem .column:nth-child(2) {
-    flex: 2;
+    flex: 1.5;
     text-align: left;
 }
 
