@@ -62,8 +62,12 @@ export const searchFlights = (req: Request, res: Response): void => {
 export const bookFlight = (req: Request, res: Response): void => {
   const { UserID, FlightID } = req.body;
   // Check 2 trường userID và flightID xem có hợp lệ không 
-  if (!UserID || !FlightID) {
-    res.status(400).json({ message: 'Missing required fields: userID or flightID' });
+  if (!FlightID) {
+    res.status(400).json({ message: 'Missing required fields: FlightID' });
+    return;
+  }
+  if (!UserID) {
+    res.status(400).json({ message: 'Missing required fields: UserID' });
     return;
   }
   const flightQuery = 'SELECT * FROM Flights WHERE FlightID = ?';
