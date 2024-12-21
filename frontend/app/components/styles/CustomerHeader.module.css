@@ -77,19 +77,40 @@
 	font-weight: bold;
 }
 
-.signOutButton {
-	background-color: var(--background); /* Nền trắng */
-	color: var(--foreground);            /* Chữ đen */
-	padding: 8px 16px;       /* Khoảng cách padding */
-	border-radius: 4px;      /* Góc bo tròn */
-	cursor: pointer;         /* Hiển thị con trỏ pointer */
-	transition: all 0.3s ease; /* Hiệu ứng hover */
-  }
-  
-  .signOutButton:hover {
-	background-color: #333333; /* Nền đen khi hover */
-	color: white;            /* Chữ trắng khi hover */
-  }
+/* Account button and dropdown menu styling */
+.accountButton {
+	position: relative;
+}
+
+.dropdownMenu {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	background-color: var(--background);
+	border: 1px solid var(--foreground);
+	border-radius: 5px;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	z-index: 1000;
+
+	.signOutButton:hover {
+		background-color: #dc3545; /* Nền đỏ khi hover */
+		color: white;            /* Chữ trắng khi hover */
+	}
+}
+
+.dropdownMenu li {
+	padding: 0.5rem 1rem;
+	cursor: pointer;
+	font-size: 13px;
+}
+
+.dropdownMenu li:hover {
+	background-color: var(--foreground);
+	color: var(--background);
+}
+
 
 /* Mobile responsiveness */
 @media (max-width: 800px) {

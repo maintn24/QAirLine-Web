@@ -83,6 +83,7 @@ const ManageBookings = () => {
                     ticket.BookingID === bookingID ? { ...ticket, BookingStatus: 'cancelled' } : ticket
                 ));
                 alert('Booking cancelled!');
+                window.location.reload();
             } else {
                 setError('Failed to cancel booking: '+ data);
             }
