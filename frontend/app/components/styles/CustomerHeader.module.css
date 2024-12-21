@@ -17,10 +17,10 @@
 }
 
 /* Logo styling */
-
 .wrapper .logo {
 	position: relative;
 	padding-bottom: 15px;
+	padding-right: 15px;
 }
 
 .wrapper .logo img {

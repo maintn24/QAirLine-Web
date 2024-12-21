@@ -24,6 +24,7 @@ interface Ticket {
 const ManageBookings = () => {
     const [ticketList, setTicketList] = useState<Ticket[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [showCancelled, setShowCancelled] = useState<boolean>(false);
     const router = useRouter();
     const [error, setError] = useState<string | null>(null);
 
@@ -118,51 +119,67 @@ const ManageBookings = () => {
     return (
         <div className={style.container}>
             <h1 className={style.title}>My Booking</h1>
+            {error && <p className={style.errorText}>{error}</p>}
+            <label>
+                <input
+                    type="checkbox"
+                    checked={showCancelled}
+                    onChange={() => setShowCancelled(!showCancelled)}
+                />
+                Show Cancelled Bookings
+            </label>
             {loading ? (
                 <div>Loading...</div>
             ) : (
                 <ul className={style.ticketlist}>
-                    {ticketList.map((ticket) => (
-                        <li key={ticket.BookingID} className={style.ticketitem}>
-                            <div className={style.column}>
-                                <div><strong>Booking ID: {ticket.BookingID}</strong></div>
-                                <div className={style.smalltext}>Booked at: {formatedDate(ticket.BookingDate)}</div>
+                    {ticketList
+                        .filter(ticket => showCancelled || ticket.BookingStatus !== 'cancelled')
+                        .map((ticket) => (
+                            <li key={ticket.BookingID} className={style.ticketitem}>
+                                <div className={style.column}>
+                                    <div><strong>Booking ID: {ticket.BookingID}</strong></div>
+                                    <div className={style.smalltext}>Booked at: {formatedDate(ticket.BookingDate)}</div>
 
-                            </div>
-                            <div className={style.column}>
-                                <strong>{ticket.Departure}</strong> → <strong>{ticket.Arrival}</strong>
-                                <div>
-                                    {formatedDate(ticket.DepartureTime)} → {formatedDate(ticket.ArrivalTime)}
                                 </div>
-                                <div className={style.smalltext}>
-                                    Flight duration: {calculateFlightDuration(ticket.DepartureTime, ticket.ArrivalTime)}
+                                <div className={style.column}>
+                                    <strong>{ticket.Departure}</strong> → <strong>{ticket.Arrival}</strong>
+                                    <div>
+                                        {formatedDate(ticket.DepartureTime)} → {formatedDate(ticket.ArrivalTime)}
+                                    </div>
+                                    <div className={style.smalltext}>
+                                        Flight
+                                        duration: {calculateFlightDuration(ticket.DepartureTime, ticket.ArrivalTime)}
+                                    </div>
+                                    <div className={style.smalltext}>
+                                        Plane: {ticket.AircraftModel}
+                                    </div>
                                 </div>
-                                <div className={style.smalltext}>
-                                    Plane: {ticket.AircraftModel}
+                                <div className={style.column}>
+                                    <div>
+                                        Booking Status
+                                    </div>
+                                    <div><strong>{ticket.BookingStatus}</strong></div>
+                                    <div>
+                                        Price: ${ticket.Price}
+                                    </div>
                                 </div>
-                            </div>
-                            <div className={style.column}>
-                                <div>
-                                    Booking Status
+                                <div className={style.column}>
+                                    <div>
+                                        <button className={style.checkinbutton}
+                                                onClick={() => executeCheckin(ticket.BookingID, ticket.FlightStatus)}>Check-in
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <button className={style.cancelbutton}
+                                                onClick={() => executeCancel(ticket.BookingID)}>Cancel
+                                        </button>
+                                    </div>
                                 </div>
-                                <div><strong>{ticket.BookingStatus}</strong></div>
-                                <div>
-                                    Price: ${ticket.Price}
-                                </div>
-                            </div>
-                            <div className={style.column}>
-                                <div>
-                                    <button className={style.checkinbutton} onClick={() => executeCheckin(ticket.BookingID, ticket.FlightStatus)}>Check-in</button>
-                                </div>
-                                <div>
-                                    <button className={style.cancelbutton} onClick={() => executeCancel(ticket.BookingID)}>Cancel</button>
-                                </div>
-                            </div>
-                        </li>
-                    ))}
+                            </li>
+                        ))}
                 </ul>
             )}
-            {error && <p className={style.errorText}>{error}</p>}
+
         </div>
     )
 }

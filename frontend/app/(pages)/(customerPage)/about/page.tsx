@@ -4,7 +4,7 @@ import styles from './aboutpage.module.css';
 const AboutPage = () => {
     return (
         <div className={styles.container}>
-            <h1 className={styles.title}>About Cloud Airline</h1>
+            <h1 className={styles.title}>About Cloud Airlines</h1>
             <p className={styles.intro}>Welcome to Cloud Airline, your trusted partner in the skies. We are committed to providing the best travel experience with our state-of-the-art fleet and exceptional customer service. Our mission is to connect people and places with the utmost comfort and reliability.</p>
 
             <h2 className={styles.subtitle}>Our Vision</h2>
