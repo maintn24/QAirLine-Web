@@ -108,3 +108,19 @@ VALUES
     ('Holiday Sale', 'Get 20% off on flights this holiday season!', '2024-12-01 12:00:00', 'promotion'),
     ('Flight Delayed', 'Your flight from Chicago to London has been delayed by 2 hours.', '2024-12-15 22:00:00', 'news'),
     ('New Route Available', 'We are now offering flights from Paris to Dubai!', '2024-12-10 08:00:00', 'news');
+ALTER TABLE Notifications
+RENAME TO OFFER;
+ALTER TABLE OFFER
+ADD COLUMN Timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE Flights
+ADD COLUMN Timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE Bookings
+DROP FOREIGN KEY Bookings_ibfk_2;
+ALTER TABLE Bookings
+ADD CONSTRAINT Bookings_ibfk_2 FOREIGN KEY (FlightID) REFERENCES Flights(FlightID) ON DELETE CASCADE;
+ALTER TABLE Payments
+DROP FOREIGN KEY Payments_ibfk_1;
+ALTER TABLE Payments
+ADD CONSTRAINT Payments_ibfk_1 FOREIGN KEY (BookingID) REFERENCES Bookings(BookingID) ON DELETE CASCADE;
+ALTER TABLE OFFER
+RENAME TO Offers;

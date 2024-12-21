@@ -1,10 +1,22 @@
 # QAirLine-Web-Development
-_Last update: 30-11-2024_
+_Last update: 09-12-2024_
 
 Member:
 - Phạm Xuân Dương (MSV: 22025518)
 - Nguyễn Thị Ngọc Mai (MSV: 22025510)
-- Trần Khánh Duy (MSV: 22025520)
+- Trần Khánh Duy (MSV: 22025520
+
+### GIT BRANCH
+- main
+- develop: Làm gì trên backend thì pull nhánh này
+- front-end: Làm gì trên frontend thì pull nhánh này
+- frontend/....: Nhánh con của front-end
+
+### GIT BRANCH
+- main
+- develop: Làm gì trên backend thì pull nhánh này
+- front-end: Làm gì trên frontend thì pull nhánh này
+- frontend/....: Nhánh con của front-end
 
 ### GIT FLOW
 *Lưu ý: Nếu muốn merge code lên develop phải thông báo lên nhóm*
@@ -21,3 +33,14 @@ Member:
 7. `Git commit -m “message”`
 8. Đẩy nhánh temp lên github: `git push origin [Tên nhánh]`
 9. Pull request
+
+### chạy được backend 14/12/2024
+1
+- npm install jsonwebtoken
+- npm install @types/jsonwebtoken --save-dev
+- thêm: "esModuleInterop": true,  vào tscconfig.json
+2
+- npm install bcryptjs
+- npm install @types/bcryptjs --save-dev
+-  thêm "esModuleInterop": true, vào tscconfig.json
+
