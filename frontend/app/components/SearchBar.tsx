@@ -20,11 +20,8 @@ interface SearchProps {
 const SearchBar: React.FC<SearchProps> = ({ search, handleInputChange, handleSearch, quickSearchBar = true }) => {
     const router = useRouter();
 
-    // Hàm xử lý query và chuyển hướng
     const executeSearch = () => {
-         // Gọi hàm xử lý logic tìm
         if (quickSearchBar) {
-            // Chuyển hướng với query params
             const query = new URLSearchParams({
                 startDestination: search.startDestination || '',
                 arriveDestination: search.arriveDestination || '',
@@ -35,63 +32,76 @@ const SearchBar: React.FC<SearchProps> = ({ search, handleInputChange, handleSea
         }
         handleSearch();
     };
-    // Hàm xử lý khi nhấn phím Enter
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLSelectElement>) => {
         if (e.key === 'Enter') {
             executeSearch();
         }
     };
 
-
     return (
         <div className={styles.container}>
             <div className={styles.searchbar}>
-                <select
-                    name="startDestination"
-                    value={search.startDestination}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                >
-                    <option value="">Start Destination</option>
-                    {search.startDestinationOptions.map((option) => (
-                        <option key={option} value={option}>
-                            {option}
-                        </option>
-                    ))}
-                </select>
-                <select
-                    name="arriveDestination"
-                    value={search.arriveDestination}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                >
-                    <option value="">Arrive Destination</option>
-                    {search.arriveDestinationOptions.map((option) => (
-                        <option key={option} value={option}>
-                            {option}
-                        </option>
-                    ))}
-                </select>
-                <input
-                    type="date"
-                    name="startDate"
-                    placeholder="Start Date"
-                    value={search.startDate}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                />
-                <input
-                    type="date"
-                    name="arriveDate"
-                    placeholder="Arrive Date"
-                    value={search.arriveDate}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                />
-                {/* Conditional rendering of button */}
+                <div className={styles.searchitem}>
+                    <label htmlFor="startDestination" className={styles.label}>Departure:</label>
+                    <select
+                        id="startDestination"
+                        name="startDestination"
+                        value={search.startDestination}
+                        onChange={handleInputChange}
+                        onKeyDown={handleKeyDown}
+                    >
+                        <option value="">Select</option>
+                        {search.startDestinationOptions.map((option) => (
+                            <option key={option} value={option}>
+                                {option}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className={styles.searchitem}>
+                    <label htmlFor="arriveDestination" className={styles.label}>Arrival:</label>
+                    <select
+                        id="arriveDestination"
+                        name="arriveDestination"
+                        value={search.arriveDestination}
+                        onChange={handleInputChange}
+                        onKeyDown={handleKeyDown}
+                    >
+                        <option value="">Select</option>
+                        {search.arriveDestinationOptions.map((option) => (
+                            <option key={option} value={option}>
+                                {option}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className={styles.searchitem}>
+                    <label htmlFor="startDate" className={styles.label}>Start Date:</label>
+                    <input
+                        id="startDate"
+                        type="date"
+                        name="startDate"
+                        placeholder="Start Date"
+                        value={search.startDate}
+                        onChange={handleInputChange}
+                        onKeyDown={handleKeyDown}
+                    />
+                </div>
+                <div className={styles.searchitem}>
+                    <label htmlFor="arriveDate" className={styles.label}>Arrive Date:</label>
+                    <input
+                        id="arriveDate"
+                        type="date"
+                        name="arriveDate"
+                        placeholder="Arrive Date"
+                        value={search.arriveDate}
+                        onChange={handleInputChange}
+                        onKeyDown={handleKeyDown}
+                    />
+                </div>
                 <button className={styles.searchButton} onClick={executeSearch}>Search</button>
             </div>
-
         </div>
     );
 };

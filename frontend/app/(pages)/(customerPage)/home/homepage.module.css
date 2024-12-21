@@ -3,6 +3,7 @@
   width: 100%;
   height: auto;
   padding-bottom: 20px;
+  background: var(--background);
 
 }
 
@@ -46,6 +47,7 @@
 
 .content {
   padding-bottom: 10px;
+  background: var(--background);
 }
 
 .hotDes{

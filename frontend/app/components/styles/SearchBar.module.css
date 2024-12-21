@@ -3,16 +3,31 @@
     display: flex;
     justify-content: center; /* Căn giữa theo chiều ngang */
     margin: auto;
-    width:auto;
-    max-width: 800px;
+    width: auto;
+    max-width: 1000px;
 }
 
 .searchbar {
     display: flex;
     margin-bottom: 1.5rem;
-    background-color: var(--background);
+    background-color: #167db5;
     border-radius: 5px;
     padding: 0.5rem;
+}
+.label {
+    margin-right: 0.5rem;
+    color: var(--background);
+}
+
+.searchitem {
+    display: flex;
+    flex-direction: column; /* Stack label and input vertically */
+    flex: 1; /* Allow items to grow equally */
+    min-width: 150px; /* Minimum width for each item */
+}
+
+.input, .select {
+    margin-right: 0.5rem;
 }
 
 @media (max-width: 800px) {
@@ -22,10 +37,10 @@
 }
 
 .searchbar select, .searchbar input {
-    background: var(--foreground);
-    color: var(--background);
+    background: var(--background);
+    color: var(--foreground);
     padding: 0.5rem;
-    border: none;
+    border: 1px solid var(--background);
     border-radius: 5px;
     font-size: 1rem;
     margin: 0.1rem;
@@ -40,7 +55,7 @@
     margin-left: 5px;
     padding: 8px 10px;
     background-color: var(--foreground);
-    color: white;
+    color: var(--background);
     border: none;
     border-radius: 5px;
     cursor: pointer;

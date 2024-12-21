@@ -4,6 +4,7 @@
     max-width: 1200px;
     padding: 20px 100px 50px;
     align-items: center;
+    background: var(--background);
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
