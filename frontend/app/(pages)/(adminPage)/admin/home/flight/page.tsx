@@ -4,11 +4,14 @@ import { Flight } from './flightObject';
 import FlightTable from './(components)/FlightTable';
 import FlightForm from './(components)/FlightForm';
 import styles from './flightPage.module.css';
+import { useRouter } from 'next/navigation';
 
 export default function FlightManagement() {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [currentFlight, setCurrentFlight] = useState<Flight | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Thêm trạng thái loading để kiểm tra token
+  const router = useRouter();
 
   // Lấy userID từ decodeToken trong localStorage
   const getUserID = () => {
@@ -119,8 +122,6 @@ export default function FlightManagement() {
     }
 };
 
-  
-
   const handleDelete = async (flightID: number) => {
     try {
       const UserID = getUserID();
@@ -167,12 +168,23 @@ export default function FlightManagement() {
       alert('An error occurred while deleting the flight. Please try again.');
     }
   };
-  
 
+  // Kiểm tra token khi trang tải
   useEffect(() => {
-    fetchFlights();
-  }, []);
+    const userID = getUserID();
+    if (!userID) {
+      // Nếu không có userID trong token, điều hướng về trang login
+      router.push("/admin?loginRequired=true");
+    } else {
+      setIsLoading(false); // Đánh dấu là đã xác thực
+      fetchFlights(); // Lấy danh sách chuyến bay sau khi xác thực
+    }
+  }, [router]);
 
+  if (isLoading) {
+    // Hiển thị loading trong quá trình kiểm tra token
+    return <div>Loading...</div>;
+  }
 
   const handleEdit = (flight: Flight) => {
     console.log('Editing Flight:', flight); // Debug thông tin chuyến bay

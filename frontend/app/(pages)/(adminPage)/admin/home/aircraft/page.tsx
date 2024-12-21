@@ -1,6 +1,8 @@
-'use client'
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import styles from "./aircraftPage.module.css";
+import { useRouter } from 'next/navigation';
+import styles from './aircraftPage.module.css';
 import AircraftTable from './(component)/AircraftTable';
 import AircraftForm from './(component)/AircraftForm';
 import { Aircraft } from './aircraftObject';
@@ -10,46 +12,60 @@ export default function AircraftManagementPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedAircraft, setSelectedAircraft] = useState<Aircraft | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true); // Track loading state
+  const router = useRouter(); // Hook để điều hướng
 
-  // Hàm lấy userID từ localStorage
-  const getUserID = () => {
+  // Hàm lấy userID từ token
+  const getUserIDFromToken = () => {
     const token = localStorage.getItem('token');
     if (!token) return null;
-    const decoded = JSON.parse(atob(token.split('.')[1]));
-    return decoded.userid;
+    try {
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      return decodedToken?.userid || null;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
   };
 
-  // Fetch data từ API
+  // Kiểm tra token khi trang load và điều hướng nếu không có token
   useEffect(() => {
+    const userID = getUserIDFromToken();
+    if (!userID) {
+      router.push('/admin?loginRequired=true'); // Điều hướng về trang login nếu không có token
+      return;
+    }
+
+    // Nếu có token, tiếp tục xử lý
     async function fetchAircrafts() {
       try {
-        const userID = getUserID();
-        if (!userID) throw new Error('User not authenticated');
-        
         const response = await fetch('http://localhost:3001/api/Aircrafts/GetAll', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ userID }) // Thêm userID vào request body
+          body: JSON.stringify({ userID }),
         });
-        
+
         const data = await response.json();
         if (!response.ok || data.message !== 'Aircraft information retrieved successfully') {
           throw new Error(data.message || 'Failed to fetch aircrafts');
         }
-        
+
         setAircrafts(data.aircrafts);
       } catch (error: any) {
         setErrorMessage(error.message);
         console.error('Error fetching aircrafts:', error);
+      } finally {
+        setLoading(false); // Dữ liệu đã được fetch xong
       }
     }
+
     fetchAircrafts();
-  }, []);
+  }, [router]);
 
   const handleAddAircraft = () => {
-    setSelectedAircraft(null); // Reset khi mở form mới
+    setSelectedAircraft(null);
     setIsFormOpen(true);
   };
 
@@ -60,7 +76,7 @@ export default function AircraftManagementPage() {
 
   const handleDeleteAircraft = async (id: number) => {
     try {
-      const userID = getUserID();
+      const userID = getUserIDFromToken();
       if (!userID) throw new Error('User not authenticated');
 
       const response = await fetch('http://localhost:3001/api/Aircrafts/Delete', {
@@ -73,7 +89,7 @@ export default function AircraftManagementPage() {
       if (!response.ok || result.message !== 'Aircraft deleted successfully') {
         throw new Error(result.message || 'Failed to delete aircraft');
       }
-      
+
       alert(result.message);
       setAircrafts(aircrafts.filter((a) => a.AircraftID !== id));
     } catch (error: any) {
@@ -84,7 +100,7 @@ export default function AircraftManagementPage() {
 
   const handleFormSubmit = async (formData: Aircraft) => {
     try {
-      const userID = getUserID();
+      const userID = getUserIDFromToken();
       if (!userID) throw new Error('User not authenticated');
 
       let url = '';
@@ -92,7 +108,6 @@ export default function AircraftManagementPage() {
       let bodyData = {};
 
       if (selectedAircraft && formData.AircraftID) {
-        // Chỉnh sửa thông tin tàu bay
         url = 'http://localhost:3001/api/Aircrafts/Edit';
         method = 'POST';
         bodyData = {
@@ -105,7 +120,6 @@ export default function AircraftManagementPage() {
           Description: formData.Description,
         };
       } else {
-        // Thêm mới tàu bay
         url = 'http://localhost:3001/api/Aircrafts/Add';
         method = 'POST';
         bodyData = {
@@ -123,7 +137,7 @@ export default function AircraftManagementPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData),
       });
-      console.log(bodyData);
+
       const result = await response.json();
       if (!response.ok || (result.message !== 'Aircraft added successfully' && result.message !== 'Aircraft information updated successfully')) {
         throw new Error(result.message || 'Failed to save aircraft');
@@ -131,14 +145,12 @@ export default function AircraftManagementPage() {
 
       alert(result.message);
       if (result.aircraftID) {
-        formData.AircraftID = result.aircraftID; // Cập nhật lại AircraftID nếu là thêm mới
+        formData.AircraftID = result.aircraftID;
       }
       setAircrafts((prevAircrafts) => {
         if (selectedAircraft) {
-          // Cập nhật bản ghi đã tồn tại
           return prevAircrafts.map((a) => (a.AircraftID === formData.AircraftID ? formData : a));
         } else {
-          // Thêm mới bản ghi
           return [...prevAircrafts, formData];
         }
       });
@@ -148,6 +160,14 @@ export default function AircraftManagementPage() {
       console.error('Error submitting aircraft data:', error);
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // Hiển thị loading khi đang xác thực hoặc fetch dữ liệu
+  }
+
+  if (errorMessage) {
+    return <div>{errorMessage}</div>; // Hiển thị thông báo lỗi nếu có
+  }
 
   return (
     <div className={styles.container}>

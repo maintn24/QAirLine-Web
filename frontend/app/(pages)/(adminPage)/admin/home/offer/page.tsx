@@ -1,13 +1,46 @@
-'use client'
-import { useState } from "react";
+'use client';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./createOfferPage.module.css";
-import adminAuthRoute from "@/app/components/AuthCheck";
 
 function CreateOfferPage() {
     const [title, setTitle] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const router = useRouter();
+
+    // Hàm giải mã token và lấy userID
+    const getUserIDFromToken = () => {
+        const token = localStorage.getItem("token"); // Lấy token từ localStorage
+        if (!token) {
+            return null; // Nếu không có token, trả về null
+        }
+
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1])); // Giải mã payload của JWT
+            return decodedToken?.userid || null; // Trả về userID nếu có
+        } catch (error) {
+            console.error("Error decoding token:", error);
+            return null; // Nếu giải mã lỗi, trả về null
+        }
+    };
+
+    // Kiểm tra token khi trang load
+    useEffect(() => {
+        const userID = getUserIDFromToken();
+        if (!userID) {
+            setError("User is not authenticated. Please log in again.");
+            setLoading(false);
+            router.push("/admin?loginRequired=true"); // Redirect to /admin if no valid token
+            return;
+        }
+
+        setIsAuthenticated(true);
+        setLoading(false); // Sau khi kiểm tra xong, set loading là false
+    }, [router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -16,17 +49,8 @@ function CreateOfferPage() {
         setError(null);
         setSuccessMessage(null);
 
-        // Lấy UserID từ localStorage
-        const decodedToken = localStorage.getItem("decodedToken");
-        if (!decodedToken) {
+        if (!isAuthenticated) {
             setError("User is not authenticated. Please log in again.");
-            return;
-        }
-
-        const { userid } = JSON.parse(decodedToken);
-
-        if (!userid) {
-            setError("User ID is missing from token. Please log in again.");
             return;
         }
 
@@ -44,12 +68,11 @@ function CreateOfferPage() {
                 body: JSON.stringify({
                     title,
                     content: description,
-                    userID: userid,
+                    userID: JSON.parse(localStorage.getItem("token") || "{}").userid, // Using token to get userID
                 }),
             });
 
             const data = await response.json();
-            console.log(data);
             if (response.ok) {
                 setSuccessMessage(`Offer created successfully`);
                 setTitle(""); // Reset title
@@ -61,6 +84,10 @@ function CreateOfferPage() {
             setError("An unexpected error occurred. Please try again later.");
         }
     };
+
+    if (loading) {
+        return <div>Loading...</div>; // Render loading khi đang kiểm tra token
+    }
 
     return (
         <div className={styles.container}>
@@ -103,4 +130,4 @@ function CreateOfferPage() {
     );
 }
 
-export default (CreateOfferPage);
+export default CreateOfferPage;

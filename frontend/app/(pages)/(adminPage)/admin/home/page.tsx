@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./adminHomePage.module.css";
 
@@ -20,16 +20,24 @@ const getUserIDFromToken = () => {
 };
 
 function HomePage() {
+    const [isLoading, setIsLoading] = useState(true); // State để kiểm tra quá trình giải mã
     const router = useRouter();
 
     // Kiểm tra token và điều hướng nếu không có userID
     useEffect(() => {
         const userID = getUserIDFromToken();
         if (!userID) {
-            // Nếu không có userID, điều hướng về trang /admin
-            router.push("/admin");
+            // Nếu không có userID, điều hướng về trang /admin và thêm tham số 'loginRequired=true'
+            router.push("/admin?loginRequired=true");
+        } else {
+            setIsLoading(false); // Đánh dấu là đã kiểm tra xong
         }
     }, [router]);
+
+    if (isLoading) {
+        // Hiển thị loading cho đến khi kiểm tra xong token
+        return <div>Loading...</div>;
+    }
 
     return (
         <div>
