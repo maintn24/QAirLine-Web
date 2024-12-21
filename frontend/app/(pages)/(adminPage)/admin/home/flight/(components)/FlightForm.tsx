@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './styles/flightForm.module.css';
 import { Flight } from '../flightObject';
 import { parse, format } from 'date-fns';
@@ -21,7 +21,39 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
     SeatsAvailable: flight?.SeatsAvailable || 0,
     Status: flight?.Status || 'Scheduled',
   });
-  
+
+  // Convert date string in dd/mm/yyyy format to ISO string
+  const convertToISO = (dateStr: string) => {
+    if (!dateStr) return '';
+    try {
+      const parsedDate = parse(dateStr, 'dd/MM/yyyy', new Date());
+      return parsedDate ? parsedDate.toISOString() : '';
+    } catch (error) {
+      return '';
+    }
+  };
+
+  // Convert ISO string to dd/mm/yyyy format
+  const convertToDisplayFormat = (isoDate: string) => {
+    if (!isoDate) return '';
+    return format(new Date(isoDate), 'dd/MM/yyyy');
+  };
+
+  useEffect(() => {
+    if (flight) {
+      setFormData({
+        FlightID: flight.FlightID,
+        AircraftModel: flight.AircraftModel,
+        Departure: flight.Departure,
+        Arrival: flight.Arrival,
+        DepartureTime: convertToDisplayFormat(flight.DepartureTime),
+        ArrivalTime: convertToDisplayFormat(flight.ArrivalTime),
+        Price: flight.Price,
+        SeatsAvailable: flight.SeatsAvailable,
+        Status: flight.Status,
+      });
+    }
+  }, [flight]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -37,15 +69,14 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
     const formattedData = {
       ...formData,
       DepartureTime: formData.DepartureTime
-        ? new Date(formData.DepartureTime).toISOString() // Chuyển trực tiếp thành ISO nếu có thể
+        ? convertToISO(formData.DepartureTime) // Convert to ISO format
         : '',
       ArrivalTime: formData.ArrivalTime
-        ? new Date(formData.ArrivalTime).toISOString()
+        ? convertToISO(formData.ArrivalTime) // Convert to ISO format
         : '',
     };
     onSubmit(formattedData);
   };
-  
 
   return (
     <div className={styles.overlay}>
