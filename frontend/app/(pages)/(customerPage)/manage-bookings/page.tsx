@@ -11,7 +11,7 @@ interface Ticket {
     BookingStatus: string;
     PaymentStatus: string;
     FlightID: number;
-    AircraftTypeID: number;
+    AircraftModel: string;
     Departure: string;
     Arrival: string;
     DepartureTime: string;
@@ -138,7 +138,7 @@ const ManageBookings = () => {
                                     Flight duration: {calculateFlightDuration(ticket.DepartureTime, ticket.ArrivalTime)}
                                 </div>
                                 <div className={style.smalltext}>
-                                    Plane ID: {ticket.AircraftTypeID}
+                                    Plane: {ticket.AircraftModel}
                                 </div>
                             </div>
                             <div className={style.column}>

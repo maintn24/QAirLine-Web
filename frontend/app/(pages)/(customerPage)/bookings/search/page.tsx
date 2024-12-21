@@ -7,7 +7,7 @@ import SearchBar from '@/app/components/SearchBar';
 
 interface Flight {
     FlightID: number;
-    AircraftTypeID: number;
+    AircraftModel: string;
     Departure: string;
     Arrival: string;
     DepartureTime: string;
@@ -29,6 +29,7 @@ const FlightBooking: React.FC = () => {
         startDestinationOptions: ['New York (JFK)', 'Chicago (ORD)', 'San Francisco (SFO)'], // Default options
         arriveDestinationOptions: ['New York (JFK)', 'Chicago (ORD)', 'San Francisco (SFO)'],
     });
+    const [error, setError] = useState<string | null>(null);
 
 
 
@@ -52,10 +53,10 @@ const FlightBooking: React.FC = () => {
                         arriveDestinationOptions: uniqueArriveDestinations,
                     }));
                 } else {
-                    console.error('Fetched data is not an array:', data);
+                    setError('Fetched data is not an array: ' + data);
                 }
             } catch (error) {
-                console.error('Error fetching flights:', error);
+                setError('Error fetching flights: ' + error);
             }
         };
         fetchFlights();
@@ -96,7 +97,7 @@ const FlightBooking: React.FC = () => {
             alert('Please sign in to book a flight');
             return;
         }
-        router.push(`/bookings/payment?flightID=${flight.FlightID}&departure=${flight.Departure}&arrival=${flight.Arrival}&departureTime=${formatedDate(flight.DepartureTime)}&arrivalTime=${formatedDate(flight.ArrivalTime)}&duration=${calculateFlightDuration(flight.DepartureTime, flight.ArrivalTime)}&price=${flight.Price}&planeType=${flight.AircraftTypeID}`);    }
+        router.push(`/bookings/payment?flightID=${flight.FlightID}&departure=${flight.Departure}&arrival=${flight.Arrival}&departureTime=${formatedDate(flight.DepartureTime)}&arrivalTime=${formatedDate(flight.ArrivalTime)}&duration=${calculateFlightDuration(flight.DepartureTime, flight.ArrivalTime)}&price=${flight.Price}&planeType=${flight.AircraftModel}`);    }
 
     // Tính thời gian bay
     const calculateFlightDuration = (departureTime: string, arrivalTime: string) => {
@@ -135,7 +136,7 @@ const FlightBooking: React.FC = () => {
                                 Flight duration: {calculateFlightDuration(flight.DepartureTime, flight.ArrivalTime)}
                             </div>
                             <div>
-                                Plane: {flight.AircraftTypeID}
+                                Plane: {flight.AircraftModel}
                             </div>
                         </div>
                         <div className={style.column}>
