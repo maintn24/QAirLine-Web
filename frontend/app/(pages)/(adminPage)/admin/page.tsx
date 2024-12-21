@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./adminLoginPage.module.css";
 
-const API_URL = 'https://q-air-line-web-56ot.vercel.app' || 'http://localhost:3001';
+const API_URL = `https://q-air-line-web-56ot.vercel.app`
 
 
 function AdminLoginPage() {

@@ -6,7 +6,7 @@ import FlightForm from './(components)/FlightForm';
 import styles from './flightPage.module.css';
 import { useRouter } from 'next/navigation';
 
-const API_URL = 'https://q-air-line-web-56ot.vercel.app' || 'http://localhost:3001';
+const API_URL = `https://q-air-line-web-56ot.vercel.app`
 
 
 export default function FlightManagement() {

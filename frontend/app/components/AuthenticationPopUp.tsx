@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import styles from "@/app/components/styles/AuthenticationPopUp.module.css";
 import {jwtDecode, JwtPayload} from "jwt-decode";
 
-const API_URL = 'https://q-air-line-web-56ot.vercel.app' || 'http://localhost:3001';
+const API_URL = `https://q-air-line-web-56ot.vercel.app`
 
 
 interface LoginPopupProps {
@@ -185,7 +185,7 @@ const AuthenticationPopUp: React.FC<LoginPopupProps> = ({ visible, setVisible })
                         <div className={styles.overlayRight}>
                             <h1>Welcome back!</h1>
                             <p className={styles.overlayText}>Nice to see you again. Enjoy your flights!</p>
-                            <p className={styles.overlayText}>Oh. Don't have an account?</p>
+                            <p className={styles.overlayText}>Oh. Don&#39;t have an account?</p>
                             <button className={styles.overlayButton} onClick={handleSignUpClick}>Sign Up</button>
                         </div>
                     </div>

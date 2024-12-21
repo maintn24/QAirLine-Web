@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./customerManagement.module.css";
 
-const API_URL = 'https://q-air-line-web-56ot.vercel.app' || 'http://localhost:3001';
+const API_URL = `https://q-air-line-web-56ot.vercel.app`
 
 
 interface Booking {
