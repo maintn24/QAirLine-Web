@@ -37,10 +37,10 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
     const formattedData = {
       ...formData,
       DepartureTime: formData.DepartureTime
-        ? parse(formData.DepartureTime, 'dd/MM/yyyy HH:mm', new Date()).toISOString()
+        ? new Date(formData.DepartureTime).toISOString() // Chuyển trực tiếp thành ISO nếu có thể
         : '',
       ArrivalTime: formData.ArrivalTime
-        ? parse(formData.ArrivalTime, 'dd/MM/yyyy HH:mm', new Date()).toISOString()
+        ? new Date(formData.ArrivalTime).toISOString()
         : '',
     };
     onSubmit(formattedData);
