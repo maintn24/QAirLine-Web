@@ -306,7 +306,7 @@ export const cancelBooking = (req: Request, res: Response): void => {
     }
 
     if (!isAdmin) {
-      res.status(404).json({ message: 'User not found or is not an admin' });
+      res.status(404).json({ message: 'User not found ' });
       return;
     }
 
@@ -392,10 +392,6 @@ export const cancelBooking = (req: Request, res: Response): void => {
     });
   });
 };
-
-
-
-
   //4. Theo dõi thông tin chuyến bay đã đặt 
   export const getUserFlights = (req: Request, res: Response): void => {
     const { userID } = req.body;
