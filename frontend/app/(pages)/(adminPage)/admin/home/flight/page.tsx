@@ -6,6 +6,10 @@ import FlightForm from './(components)/FlightForm';
 import styles from './flightPage.module.css';
 import { useRouter } from 'next/navigation';
 
+import dotenv from 'dotenv';
+dotenv.config();
+const API_URL = process.env.URL || 'http://localhost:3001';
+
 export default function FlightManagement() {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [currentFlight, setCurrentFlight] = useState<Flight | null>(null);
@@ -25,7 +29,7 @@ export default function FlightManagement() {
     try {
       const userid = getUserID();
       if (!userid) throw new Error('User not authenticated');
-      const response = await fetch('http://localhost:3001/api/Flights/GetAllFlights', {
+      const response = await fetch(`${API_URL}/api/Flights/GetAllFlights`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -52,7 +56,7 @@ export default function FlightManagement() {
 
         if (currentFlight && flight.FlightID) {
             // Chỉnh sửa chuyến bay
-            url = 'http://localhost:3001/api/Flights/Edit';
+            url = `${API_URL}/api/Flights/Edit`;
             method = 'POST';
             bodyData = {
               userID: userID,

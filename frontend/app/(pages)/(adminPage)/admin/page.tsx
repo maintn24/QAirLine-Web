@@ -3,6 +3,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./adminLoginPage.module.css";
 
+import dotenv from 'dotenv';
+dotenv.config();
+const API_URL = process.env.URL || 'http://localhost:3001';
+
 function AdminLoginPage() {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -28,7 +32,7 @@ function AdminLoginPage() {
         }
 
         try {
-            const response = await fetch('http://localhost:3001/api/auth/signin', {
+            const response = await fetch(`${API_URL}/api/auth/signin`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

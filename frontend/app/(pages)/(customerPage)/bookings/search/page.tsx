@@ -5,6 +5,10 @@ import {format} from 'date-fns';
 import style from './search.module.css';
 import SearchBar from '@/app/components/SearchBar';
 
+import dotenv from 'dotenv';
+dotenv.config();
+const API_URL = process.env.URL || 'http://localhost:3001';
+
 interface Flight {
     FlightID: number;
     AircraftModel: string;
@@ -37,7 +41,7 @@ const FlightBooking: React.FC = () => {
     useEffect(() => {
         const fetchFlights = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/Flights/GetAllFlights');
+                const response = await fetch(`${API_URL}}/api/Flights/GetAllFlights`);
                 const data = await response.json();
 
                 if (response.ok && Array.isArray(data)) {

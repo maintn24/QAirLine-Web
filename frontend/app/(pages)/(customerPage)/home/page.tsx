@@ -6,6 +6,10 @@ import {jwtDecode, JwtPayload} from "jwt-decode";
 import "@/app/global/global.css";
 import SearchBar from "@/app/components/SearchBar";
 
+import dotenv from 'dotenv';
+dotenv.config();
+const API_URL = process.env.URL || 'http://localhost:3001';
+
 
 export default function Home() {
   const [search, setSearch] = useState({
@@ -26,7 +30,7 @@ export default function Home() {
         setName(localStorage.getItem('name'));
         const fetchLocations = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/Flights/GetAllFlights');
+                const response = await fetch(`${API_URL}/api/Flights/GetAllFlights`);
                 const data: { Departure: string; Arrival: string }[] = await response.json();
                 const uniqueStartDestinations = Array.from(new Set(data.map(flight => flight.Departure)));
                 const uniqueArriveDestinations = Array.from(new Set(data.map(flight => flight.Arrival)));
@@ -50,7 +54,7 @@ export default function Home() {
     useEffect(() => {
         const fetchOffers = async () => {
         try {
-            const response = await fetch('http://localhost:3001/api/Offers/GetAllOffers');
+            const response = await fetch(`${API_URL}/api/Offers/GetAllOffers`);
             if (!response.ok) {
             throw new Error('Failed to fetch offers');
             }

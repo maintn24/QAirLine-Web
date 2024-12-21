@@ -4,6 +4,10 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./customerManagement.module.css";
 
+import dotenv from 'dotenv';
+dotenv.config();
+const API_URL = process.env.URL || 'http://localhost:3001';
+
 interface Booking {
   BookingID: number;
   UserID: string;
@@ -63,7 +67,7 @@ const CustomerPage = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3001/api/Bookings/ViewAndSummarize",
+          `${API_URL}/api/Bookings/ViewAndSummarize`,
           {
             method: "POST",
             headers: {

@@ -3,6 +3,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./createOfferPage.module.css";
 
+import dotenv from 'dotenv';
+dotenv.config();
+const API_URL = process.env.URL || 'http://localhost:3001';
+
 function CreateOfferPage() {
     const [title, setTitle] = useState<string>("");
     const [description, setDescription] = useState<string>("");
@@ -60,7 +64,7 @@ function CreateOfferPage() {
         }
 
         try {
-            const response = await fetch("http://localhost:3001/api/Offers/CreateOffer", {
+            const response = await fetch(`${API_URL}/api/Offers/CreateOffer`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

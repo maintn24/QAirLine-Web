@@ -2,6 +2,10 @@ import React, {useEffect, useState} from "react";
 import styles from "@/app/components/styles/AuthenticationPopUp.module.css";
 import {jwtDecode, JwtPayload} from "jwt-decode";
 
+import dotenv from 'dotenv';
+dotenv.config();
+const API_URL = process.env.URL || 'http://localhost:3001';
+
 interface LoginPopupProps {
     visible: boolean;
     setVisible: (visible: boolean) => void;
@@ -71,7 +75,7 @@ const AuthenticationPopUp: React.FC<LoginPopupProps> = ({ visible, setVisible })
             return;
         }
         try {
-            const response = await fetch('http://localhost:3001/api/auth/signup', {
+            const response = await fetch(`${API_URL}/api/auth/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -104,7 +108,7 @@ const AuthenticationPopUp: React.FC<LoginPopupProps> = ({ visible, setVisible })
             return;
         }
         try {
-            const response = await fetch('http://localhost:3001/api/auth/signin', {
+            const response = await fetch(`${API_URL}/api/auth/signin`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -4,6 +4,10 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from "./offerPage.module.css";
 
+import dotenv from 'dotenv';
+dotenv.config();
+const API_URL = process.env.URL || 'http://localhost:3001';
+
 interface Offer {
   id: number;
   title: string;
@@ -21,7 +25,7 @@ const OffersPage = () => {
   useEffect(() => {
     const fetchOffers = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/Offers/GetAllOffers');
+        const response = await fetch(`${API_URL}/api/Offers/GetAllOffers`);
         if (!response.ok) {
           throw new Error('Failed to fetch offers');
         }

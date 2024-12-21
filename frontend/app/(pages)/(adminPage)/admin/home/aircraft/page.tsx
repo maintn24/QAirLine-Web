@@ -7,6 +7,10 @@ import AircraftTable from './(component)/AircraftTable';
 import AircraftForm from './(component)/AircraftForm';
 import { Aircraft } from './aircraftObject';
 
+import dotenv from 'dotenv';
+dotenv.config();
+const API_URL = process.env.URL || 'http://localhost:3001';
+
 export default function AircraftManagementPage() {
   const [aircrafts, setAircrafts] = useState<Aircraft[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -39,7 +43,7 @@ export default function AircraftManagementPage() {
     // Nếu có token, tiếp tục xử lý
     async function fetchAircrafts() {
       try {
-        const response = await fetch('http://localhost:3001/api/Aircrafts/GetAll', {
+        const response = await fetch(`${API_URL}/api/Aircrafts/GetAll`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -79,7 +83,7 @@ export default function AircraftManagementPage() {
       const userID = getUserIDFromToken();
       if (!userID) throw new Error('User not authenticated');
 
-      const response = await fetch('http://localhost:3001/api/Aircrafts/Delete', {
+      const response = await fetch(`${API_URL}/api/Aircrafts/Delete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userID, aircraftID: id }),
@@ -108,7 +112,7 @@ export default function AircraftManagementPage() {
       let bodyData = {};
 
       if (selectedAircraft && formData.AircraftID) {
-        url = 'http://localhost:3001/api/Aircrafts/Edit';
+        url = `${API_URL}/api/Aircrafts/Edit`;
         method = 'POST';
         bodyData = {
           UserID: userID,
@@ -120,7 +124,7 @@ export default function AircraftManagementPage() {
           Description: formData.Description,
         };
       } else {
-        url = 'http://localhost:3001/api/Aircrafts/Add';
+        url = `${API_URL}/api/Aircrafts/Add`;
         method = 'POST';
         bodyData = {
           Model: formData.Model,

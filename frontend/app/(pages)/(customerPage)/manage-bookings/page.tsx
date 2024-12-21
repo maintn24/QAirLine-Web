@@ -5,6 +5,10 @@ import "@/app/global/global.css";
 import {useRouter} from "next/navigation";
 import {format} from "date-fns";
 
+import dotenv from 'dotenv';
+dotenv.config();
+const API_URL = process.env.URL || 'http://localhost:3001';
+
 interface Ticket {
     BookingID: number;
     BookingDate: string;
@@ -41,7 +45,7 @@ const ManageBookings = () => {
                 const userID = localStorage.getItem('userid');
                 const token = localStorage.getItem('token');
                 try {
-                    const response = await fetch('http://localhost:3001/api/Flights/GetUserFlights', {
+                    const response = await fetch(`${API_URL}/api/Flights/GetUserFlights`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -70,7 +74,7 @@ const ManageBookings = () => {
         const userID = localStorage.getItem('userid');
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch('http://localhost:3001/api/Bookings/CancelBooking', {
+            const response = await fetch(`${API_URL}/api/Bookings/CancelBooking`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

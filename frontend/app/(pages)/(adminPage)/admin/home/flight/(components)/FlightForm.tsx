@@ -4,6 +4,10 @@ import { Flight } from '../flightObject';
 import { parse, format } from 'date-fns';
 import { Aircraft } from '../../aircraft/aircraftObject';
 
+import dotenv from 'dotenv';
+dotenv.config();
+const API_URL = process.env.URL || 'http://localhost:3001';
+
 type FlightFormProps = {
   flight: Flight | null;
   onClose: () => void;
@@ -41,7 +45,7 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
           console.error('UserID không có trong token');
           return;
         }
-        const response = await fetch('http://localhost:3001/api/Aircrafts/GetAll', {
+        const response = await fetch(`${API_URL}/api/Aircrafts/GetAll`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
