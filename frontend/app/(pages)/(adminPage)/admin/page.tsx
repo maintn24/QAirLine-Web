@@ -1,15 +1,14 @@
 'use client';
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import styles from "./adminLoginPage.module.css";
 
 function AdminLoginPage() {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [error, setError] = useState<string | null>(null);
-    const router = useRouter();
-    const searchParams = useSearchParams();  // Lấy query params từ URL
     const [showLoginRequired, setShowLoginRequired] = useState(false);
+    const router = useRouter();
 
     // Hàm lưu token vào localStorage
     const saveTokenToLocalStorage = (token: string) => {
@@ -17,14 +16,17 @@ function AdminLoginPage() {
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
-        localStorage.clear();
+        localStorage.clear(); // Xóa tất cả dữ liệu cũ trong localStorage
         e.preventDefault();
+
         // Reset error state
         setError(null);
+
         if (!email || !password) {
-            console.error('All fields are required for signin');
+            setError("Email and password are required.");
             return;
         }
+
         try {
             const response = await fetch('http://localhost:3001/api/auth/signin', {
                 method: 'POST',
@@ -33,17 +35,15 @@ function AdminLoginPage() {
                 },
                 body: JSON.stringify({ email, password }),
             });
-            console.log("Request body:", JSON.stringify({ email, password }));
+
             const data = await response.json();
-            
+
             if (response.ok) {
                 const token = data.token;
-                // Lưu token vào localStorage
-                saveTokenToLocalStorage(token);
+                saveTokenToLocalStorage(token); // Lưu token vào localStorage
                 alert("Signin successful");
                 router.push("/admin/home"); // Điều hướng đến trang home
             } else {
-                console.error("Login error:", data);
                 setError(data.message || "Login failed. Please try again.");
             }
         } catch (error) {
@@ -51,18 +51,21 @@ function AdminLoginPage() {
         }
     };
 
-    // Check query parameter 'loginRequired' in URL and show message accordingly
+    // Kiểm tra nếu user đã login
     useEffect(() => {
-        if (searchParams.get('loginRequired') === 'true') {
-            setShowLoginRequired(true);
+        const token = localStorage.getItem("token");
+        if (token) {
+            router.push("/admin/home"); // Redirect nếu đã login
+        } else {
+            setShowLoginRequired(true); // Hiển thị thông báo yêu cầu login
         }
-    }, [searchParams]);
+    }, [router]);
 
     return (
         <div className={styles.container}>
             <div className={styles.loginBox}>
                 <h1 className={styles.title}>Admin Login Page</h1>
-                {showLoginRequired && <p className={styles.error}>Please log in to continue.</p>}
+                
                 <form onSubmit={handleSubmit}>
                     <div className={styles.inputContainer}>
                         <label htmlFor="email" className={styles.label}>

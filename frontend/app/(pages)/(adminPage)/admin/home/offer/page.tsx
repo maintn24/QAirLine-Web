@@ -34,7 +34,7 @@ function CreateOfferPage() {
         if (!userID) {
             setError("User is not authenticated. Please log in again.");
             setLoading(false);
-            router.push("/admin?loginRequired=true"); // Redirect to /admin if no valid token
+            router.push("/admin"); // Redirect to /admin if no valid token
             return;
         }
         setUserID(userID); // Set userID in state

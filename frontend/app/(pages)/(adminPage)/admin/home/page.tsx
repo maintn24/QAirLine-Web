@@ -28,7 +28,7 @@ function HomePage() {
         const userID = getUserIDFromToken();
         if (!userID) {
             // Nếu không có userID, điều hướng về trang /admin và thêm tham số 'loginRequired=true'
-            router.push("/admin?loginRequired=true");
+            router.push("/admin");
         } else {
             setIsLoading(false); // Đánh dấu là đã kiểm tra xong
         }

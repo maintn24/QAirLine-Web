@@ -174,7 +174,7 @@ export default function FlightManagement() {
     const userID = getUserID();
     if (!userID) {
       // Nếu không có userID trong token, điều hướng về trang login
-      router.push("/admin?loginRequired=true");
+      router.push("/admin");
     } else {
       setIsLoading(false); // Đánh dấu là đã xác thực
       fetchFlights(); // Lấy danh sách chuyến bay sau khi xác thực

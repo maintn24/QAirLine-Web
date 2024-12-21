@@ -32,7 +32,7 @@ export default function AircraftManagementPage() {
   useEffect(() => {
     const userID = getUserIDFromToken();
     if (!userID) {
-      router.push('/admin?loginRequired=true'); // Điều hướng về trang login nếu không có token
+      router.push('/admin'); // Điều hướng về trang login nếu không có token
       return;
     }
 
