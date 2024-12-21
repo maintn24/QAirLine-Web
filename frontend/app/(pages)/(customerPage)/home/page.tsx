@@ -6,10 +6,7 @@ import {jwtDecode, JwtPayload} from "jwt-decode";
 import "@/app/global/global.css";
 import SearchBar from "@/app/components/SearchBar";
 
-import dotenv from 'dotenv';
-dotenv.config();
-const API_URL = process.env.URL || 'http://localhost:3001';
-
+const API_URL = 'https://q-air-line-web-56ot.vercel.app' || 'http://localhost:3001';
 
 export default function Home() {
   const [search, setSearch] = useState({

@@ -2,9 +2,8 @@ import React, {useEffect, useState} from "react";
 import styles from "@/app/components/styles/AuthenticationPopUp.module.css";
 import {jwtDecode, JwtPayload} from "jwt-decode";
 
-import dotenv from 'dotenv';
-dotenv.config();
-const API_URL = process.env.URL || 'http://localhost:3001';
+const API_URL = 'https://q-air-line-web-56ot.vercel.app' || 'http://localhost:3001';
+
 
 interface LoginPopupProps {
     visible: boolean;

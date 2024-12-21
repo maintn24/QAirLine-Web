@@ -7,9 +7,8 @@ import AircraftTable from './(component)/AircraftTable';
 import AircraftForm from './(component)/AircraftForm';
 import { Aircraft } from './aircraftObject';
 
-import dotenv from 'dotenv';
-dotenv.config();
-const API_URL = process.env.URL || 'http://localhost:3001';
+const API_URL = 'https://q-air-line-web-56ot.vercel.app' || 'http://localhost:3001';
+
 
 export default function AircraftManagementPage() {
   const [aircrafts, setAircrafts] = useState<Aircraft[]>([]);

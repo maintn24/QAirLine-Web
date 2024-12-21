@@ -6,9 +6,8 @@ import FlightForm from './(components)/FlightForm';
 import styles from './flightPage.module.css';
 import { useRouter } from 'next/navigation';
 
-import dotenv from 'dotenv';
-dotenv.config();
-const API_URL = process.env.URL || 'http://localhost:3001';
+const API_URL = 'https://q-air-line-web-56ot.vercel.app' || 'http://localhost:3001';
+
 
 export default function FlightManagement() {
   const [flights, setFlights] = useState<Flight[]>([]);

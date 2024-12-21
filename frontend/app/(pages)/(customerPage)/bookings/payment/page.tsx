@@ -4,9 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import style from './payment.module.css';
 import styles from "@/app/components/styles/AuthenticationPopUp.module.css";
 
-import dotenv from 'dotenv';
-dotenv.config();
-const API_URL = process.env.URL || 'http://localhost:3001';
+const API_URL = 'https://q-air-line-web-56ot.vercel.app' || 'http://localhost:3001';
 
 const PaymentPage = () => {
     const searchParams = useSearchParams();
