@@ -1,12 +1,12 @@
 .payment {
     margin: auto;
-    max-width: 1000px;
     font-family: "Montserrat", sans-serif;
-    padding: 2rem 5rem;
+    max-width: 1200px;
+    padding: 20px 100px 50px;
     background: var(--background);
     color: var(--foreground);
-    /*border-radius: 5px;*/
-    /*box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);*/
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .payment h1 {
