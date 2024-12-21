@@ -100,12 +100,11 @@ const CustomerPage = () => {
   // Lọc dữ liệu theo `BookingDate`
   useEffect(() => {
     if (searchDate) {
-      setFilteredData(
-        data.filter(
-          (booking) =>
-            booking.BookingDate && booking.BookingDate.includes(searchDate)
-        )
+      const filtered = data.filter(
+        (booking) =>
+          booking.BookingDate && booking.BookingDate.includes(searchDate)
       );
+      setFilteredData(filtered);
     } else {
       setFilteredData(data);
     }
@@ -114,6 +113,9 @@ const CustomerPage = () => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchDate(e.target.value);
   };
+
+  // Đếm số lượng booking khớp với searchDate
+  const matchingBookingsCount = filteredData.length;
 
   if (loading) {
     return <div>Loading...</div>; // Chỉ render Loading khi đang kiểm tra token và fetch dữ liệu
@@ -125,11 +127,12 @@ const CustomerPage = () => {
 
   return (
     <div className={styles.tableContainer}>
-      <h1 className={styles.title}>---Customers Management---</h1>
+      <h1 className={styles.title}>---Customers Booking Management---</h1>
       {summary && (
         <div className={styles.summary}>
           <p>Total Bookings: {summary.totalBookings}</p>
-          <p>Last Updated: {new Date(summary.timestamp).toLocaleString()}</p>
+          {/* <p>Last Updated: {new Date(summary.timestamp).toLocaleString()}</p> */}
+          <p>Filtered Bookings: {matchingBookingsCount}</p> {/* Hiển thị số lượng bookings khớp */}
         </div>
       )}
       <input
@@ -142,6 +145,7 @@ const CustomerPage = () => {
       <table className={styles.table}>
         <thead>
           <tr>
+            <th>#</th>
             <th>BookID</th>
             <th>UserID</th>
             <th>UserName</th>
@@ -155,8 +159,9 @@ const CustomerPage = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredData.map((booking) => (
+          {filteredData.map((booking, index) => (
             <tr key={booking.BookingID}>
+              <td>{index + 1}</td>
               <td>{booking.BookingID}</td>
               <td>{booking.UserID}</td>
               <td>{booking.UserName}</td>
