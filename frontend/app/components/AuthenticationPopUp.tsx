@@ -1,6 +1,5 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import styles from "@/app/components/styles/AuthenticationPopUp.module.css";
-import {useRouter} from "next/navigation";
 import {jwtDecode, JwtPayload} from "jwt-decode";
 
 interface LoginPopupProps {
@@ -23,19 +22,17 @@ interface SignInData {
 
 
 const AuthenticationPopUp: React.FC<LoginPopupProps> = ({ visible, setVisible }) => {
-    const [isRightPanelActive, setisRightPanelActive] = useState(false);
+    const [isRightPanelActive, setIsRightPanelActive] = useState(false);
     const [signUpData, setSignUpData] = useState({ name: '', username: '', email: '', password: '', role: 'Customer' });
     const [signInData, setSignInData] = useState({ email: '', password: '' });
     const [error, setError] = useState<string | null>(null);
-    const [userID, setUserID] = useState<string | null>(null);
-    const router = useRouter();
 
     const handleSignUpClick = () => {
-        setisRightPanelActive(true);
+        setIsRightPanelActive(true);
     };
 
     const handleSignInClick = () => {
-        setisRightPanelActive(false);
+        setIsRightPanelActive(false);
     };
 
     const closePopup = () => {
@@ -49,16 +46,11 @@ const AuthenticationPopUp: React.FC<LoginPopupProps> = ({ visible, setVisible })
             if (token) {
                 try {
                     const decoded = jwtDecode<JwtPayload & { role?: string } & {name?: string} & {userid?: string}>(token);
-                    console.log('Decoded UserRole:', decoded.role);
                     localStorage.setItem('role', decoded.role as string);
-                    console.log('Decoded Name:', decoded.name);
                     localStorage.setItem('name', decoded.name as string);
-                    console.log('Decoded User ID:', decoded.userid);
                     localStorage.setItem('userid', decoded.userid as string);
                     console.log('Decoded token:', decoded);
-                    
                     localStorage.setItem("userid", decoded.userid? decoded.userid: "null");
-                    
                 } catch (error) {
                     console.error('Error decoding token:', error);
                 }

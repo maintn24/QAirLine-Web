@@ -2,13 +2,13 @@
 import React, {Suspense, useEffect, useState} from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import style from './payment.module.css';
+import styles from "@/app/components/styles/AuthenticationPopUp.module.css";
 
 const PaymentPage = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const [UserID, setUserID] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
-
     const FlightID = searchParams.get('flightID');
     const departure = searchParams.get('departure');
     const arrival = searchParams.get('arrival');
@@ -30,14 +30,13 @@ const PaymentPage = () => {
     }, []);
 
     const handlePurchase = async () => {
-        alert('Purchase button clicked');
-        console.log('Payment Flight ID:', FlightID);
-        console.log('Payment User ID:', UserID);
+        // console.log('Payment Flight ID:', FlightID);
+        // console.log('Payment User ID:', UserID);
         // Reset error state
         setError(null);
 
         if (!UserID || !FlightID) {
-            alert('User ID or Flight ID is missing');
+            setError('User ID or Flight ID is missing');
             return;
         }
 
@@ -61,9 +60,9 @@ const PaymentPage = () => {
             } else {
                 setError(`Purchase failed: ${data.message}`);
             }
-        } catch (error) {
-            setError('Error during purchase');
-            alert('An error occurred during the purchase.');
+        } catch (error:any) {
+            setError(`Error during purchase: ${error.message}`);
+            alert(`An error occurred during the purchase: ${error.message}`);
         }
 
     };
@@ -71,7 +70,6 @@ const PaymentPage = () => {
     return (
         <div className={style.payment}>
             <h1>Payment</h1>
-            <h2>{error}</h2>
             <div>Flight infomation</div>
             <div className={style.flightInfo}>
                 <div className={style.column}>
@@ -93,6 +91,7 @@ const PaymentPage = () => {
                 </div>
             </div>
             <button onClick={handlePurchase} className={style.purchaseButton}>Purchase</button>
+            {error && <p className={styles.errorText}>{error}</p>}
         </div>
     );
 };

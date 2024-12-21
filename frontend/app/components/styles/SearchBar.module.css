@@ -1,13 +1,18 @@
 /* Container bao bọc cả SearchBar và Button */
-.container{
+.container {
     display: flex;
     justify-content: center; /* Căn giữa theo chiều ngang */
     margin: auto;
+    width:auto;
+    max-width: 800px;
 }
 
 .searchbar {
     display: flex;
     margin-bottom: 1.5rem;
+    background-color: var(--background);
+    border-radius: 5px;
+    padding: 0.5rem;
 }
 
 @media (max-width: 800px) {
@@ -24,14 +29,13 @@
     border-radius: 5px;
     font-size: 1rem;
     margin: 0.1rem;
-    flex: 1 ;
+    flex: 1;
 }
 
 .searchbar input::placeholder {
     color: var(--background);
 }
 
-    
 .searchButton {
     margin-left: 5px;
     padding: 8px 10px;
@@ -42,11 +46,9 @@
     cursor: pointer;
     font-size: 1rem;
     transition: background-color 0.3s ease;
-
     width: auto; /* Đảm bảo kích thước tự động theo nội dung */
-    flex: none;                 /* Không cho nút co giãn theo flex */
-    align-self: center;         /* Căn giữa nút nếu parent là flex */
-
+    flex: none; /* Không cho nút co giãn theo flex */
+    align-self: center; /* Căn giữa nút nếu parent là flex */
 }
 
 .searchButton:hover {
