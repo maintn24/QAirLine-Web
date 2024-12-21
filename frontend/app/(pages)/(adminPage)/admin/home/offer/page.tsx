@@ -42,16 +42,16 @@ function CreateOfferPage() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    UserID: userid,
                     title,
                     content: description,
+                    userID: userid,
                 }),
             });
 
             const data = await response.json();
             console.log(data);
             if (response.ok) {
-                setSuccessMessage(`Offer created successfully with ID: ${data.offerID}`);
+                setSuccessMessage(`Offer created successfully`);
                 setTitle(""); // Reset title
                 setDescription(""); // Reset description
             } else {

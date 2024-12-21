@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './styles/flightTable.module.css';
 import { Flight } from '../flightObject';
+import { parse, format } from 'date-fns';
 
 type FlightTableProps = {
   flights: Flight[];
@@ -9,18 +10,31 @@ type FlightTableProps = {
 };
 
 export default function FlightTable({ flights, onEdit, onDelete }: FlightTableProps) {
+  // Hàm định dạng thời gian
+  const formatDate = (dateString: string) => {
+    try {
+      // Nếu là ISO, dùng trực tiếp
+      const date = dateString.includes('T')
+        ? new Date(dateString)
+        : parse(dateString, 'dd/MM/yyyy HH:mm', new Date()); // Chuyển chuỗi "22/12/2024 04:15"
+      return format(date, 'dd/MM/yyyy HH:mm'); // Định dạng lại nếu cần
+    } catch (error) {
+      console.error('Invalid date:', dateString);
+      return 'Invalid date';
+    }
+  };
   return (
     <table className={styles.table}>
       <thead>
         <tr>
           <th>ID</th>
-          <th>Aircraft Model</th>
+          <th>AircraftModel</th>
           <th>Departure</th>
           <th>Arrival</th>
-          <th>Departure Time</th>
-          <th>Arrival Time</th>
+          <th>Departure  Time</th>
+          <th>Arrival  Time</th>
           <th>Price</th>
-          <th>Seats Available</th>
+          <th>SeatsAvail</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
@@ -32,8 +46,8 @@ export default function FlightTable({ flights, onEdit, onDelete }: FlightTablePr
             <td>{flight.AircraftModel}</td>
             <td>{flight.Departure}</td>
             <td>{flight.Arrival}</td>
-            <td>{flight.DepartureTime}</td>
-            <td>{flight.ArrivalTime}</td>
+            <td>{formatDate(flight.DepartureTime)}</td>
+            <td>{formatDate(flight.ArrivalTime)}</td>
             <td>{flight.Price}</td>
             <td>{flight.SeatsAvailable}</td>
             <td>{flight.Status}</td>

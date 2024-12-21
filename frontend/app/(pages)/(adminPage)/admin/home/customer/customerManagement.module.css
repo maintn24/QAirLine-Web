@@ -11,7 +11,9 @@
   
   .title {
     margin-bottom: 1rem;
+    font-weight: bolder;
     color: #333;
+    font-size:xx-large;
   }
   
   .table {
@@ -40,3 +42,19 @@
     background-color: #e3f2fd;
   }
   
+
+  .searchBar {
+    width: 50%; /* Chiều rộng thanh tìm kiếm */
+    margin: 1rem auto; /* Căn giữa thanh tìm kiếm */
+    padding: 0.8rem; /* Đệm bên trong */
+    border: 1px solid #ccc; /* Viền màu xám nhạt */
+    border-radius: 5px; /* Góc bo tròn */
+    font-size: 1rem; /* Kích thước chữ */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Hiệu ứng đổ bóng */
+  }
+  
+  .searchBar:focus {
+    border-color: #167db5; /* Màu viền khi focus */
+    outline: none; /* Bỏ viền mặc định */
+    box-shadow: 0 0 8px rgba(22, 125, 181, 0.5); /* Hiệu ứng focus */
+  }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styles from './styles/flightForm.module.css';
 import { Flight } from '../flightObject';
+import { parse, format } from 'date-fns';
 
 type FlightFormProps = {
   flight: Flight | null; // Nếu là null, form sẽ dùng để thêm mới
@@ -32,8 +33,19 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    // Chuyển đổi trước khi gửi
+    const formattedData = {
+      ...formData,
+      DepartureTime: formData.DepartureTime
+        ? parse(formData.DepartureTime, 'dd/MM/yyyy HH:mm', new Date()).toISOString()
+        : '',
+      ArrivalTime: formData.ArrivalTime
+        ? parse(formData.ArrivalTime, 'dd/MM/yyyy HH:mm', new Date()).toISOString()
+        : '',
+    };
+    onSubmit(formattedData);
   };
+  
 
   return (
     <div className={styles.overlay}>
