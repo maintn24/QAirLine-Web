@@ -3,7 +3,7 @@ import connection from '../database/database';
 import { OkPacket } from 'mysql2'; 
 import { RowDataPacket } from 'mysql2/';
 import moment from 'moment-timezone';
-
+import { sendEmail } from './EmailService';
  // Kiểm tra UserID có tồn tại và có phải Admin không
  const checkUserIsAdmin = (userID: number, callback: (isAdmin: boolean, error?: any) => void): void => {
   const query = 'SELECT Role FROM Users WHERE UserID = ?';
@@ -62,7 +62,6 @@ const checkPostExists = (postID: number, callback: (exists: boolean, error?: any
     callback(postResults.length > 0);
   });
 };
-
 
 //Chức năng Guest 
 //1. Lấy danh sách Offers
@@ -360,7 +359,7 @@ export const cancelBooking = (req: Request, res: Response): void => {
   };
   
 //CHỨC NĂNG ADMIN
-  //1. Tạo thông tin
+  //1. Tạo Offer
   export const CreateOffer = (req: Request, res: Response): void => {
     const { title, content, userID } = req.body;
 
@@ -414,6 +413,28 @@ export const cancelBooking = (req: Request, res: Response): void => {
           });
         });
       });
+    });
+    // Sau khi lưu Offer thành công
+      const getUsersQuery = 'SELECT Email FROM Users WHERE Email IS NOT NULL';
+      connection.query(getUsersQuery, (err, results) => {
+      if (err) {
+        console.error('Error fetching user emails:', err);
+        return res.status(500).json({ message: 'Failed to fetch user emails' });
+      }
+
+      const emails = (results as any[]).map((user) => user.Email);
+
+      // Gửi email thông báo
+      emails.forEach((email) => {
+        sendEmail(
+          email,
+          `New Offer: ${title}`,
+          `Hello,\n\nWe have a new offer for you:\n\n${content}\n\nBest regards,\nYour Team`
+        ).catch((error) => console.error(`Failed to send email to ${email}:`, error));
+      });
+
+      // Phản hồi thành công
+      res.status(201).json({ message: 'Offer posted and notifications sent' });
     });
   };
 
@@ -1007,7 +1028,7 @@ export const editFlight = (req: Request, res: Response): void => {
 
         const flight = flights[0];
 
-        // Nếu không có giá trị mới, sử dụng thời gian cũ từ cơ sở dữ liệu
+        // set time VN
         const updatedDepartureTime = departureTime
           ? moment(departureTime).tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss')
           : flight.DepartureTime;
@@ -1063,5 +1084,27 @@ export const editFlight = (req: Request, res: Response): void => {
         );
       });
     });
+  });
+  // Sau khi cập nhật Flight thành công
+  const getUsersQuery = 'SELECT Email FROM Users WHERE Email IS NOT NULL';
+  connection.query(getUsersQuery, (err, results) => {
+    if (err) {
+      console.error('Error fetching user emails:', err);
+      return res.status(500).json({ message: 'Failed to fetch user emails' });
+    }
+
+    const emails = (results as any[]).map((user) => user.Email);
+
+    // Gửi email thông báo
+    emails.forEach((email) => {
+      sendEmail(
+        email,
+        `Flight Update Notification`,
+        `Hello,\n\nThe flight details have been updated:\n\nFrom: ${departure}\nTo: ${arrival}\nDeparture Time: ${departureTime}\nArrival Time: ${arrivalTime}\n\nBest regards,\nYour Team`
+      ).catch((error) => console.error(`Failed to send email to ${email}:`, error));
+    });
+
+    // Phản hồi thành công
+    res.status(200).json({ message: 'Flight updated and notifications sent' });
   });
 };
