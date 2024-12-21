@@ -8,13 +8,15 @@
 }
 
 .title {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+    text-align: left;
+    margin-bottom: 1.5rem;
     color: var(--foreground);
+    font-weight: bold;
+    font-size: 30px;
 }
 
 .intro {
-    font-size: 1.2rem;
+    font-size: 1rem;
     margin-bottom: 2rem;
     color: #555;
 }

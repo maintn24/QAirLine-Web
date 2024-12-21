@@ -45,7 +45,7 @@ export default function Header() {
     <header className={style.header}>
       <div className={style.wrapper}>
         <div className={style.logo}>
-          <img src={`/Logo/LogoS.png`} style={{ cursor: 'pointer' }} alt="Cloud Airlines Logo"
+          <img src={`/Logo/mini_logo.svg`} style={{ cursor: 'pointer' }} alt="Cloud Airlines Logo"
             onClick={toHomePage} />
         </div>
         <div className={style.container}>

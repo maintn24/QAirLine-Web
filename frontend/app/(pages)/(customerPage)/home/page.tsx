@@ -87,11 +87,13 @@ export default function Home() {
 
   return (
       <main>
-          <div className={style.welcome}>
-              Welcome to Cloud Airlines! {role} {name}
-          </div>
+
           <div className={style.main_image}>
-              <img src="Placeholder/image_mainpage.png" alt="Main image"></img>
+              <img className={style.placeholder} src={'Placeholder/plane2.jpg'} alt="Main image"></img>
+              <div className={style.welcome}>
+                  Welcome to
+                  <img src={`/Logo/big_logo.svg`} alt="Big Logo"/>
+              </div>
           </div>
 
           <div className="searchBar">

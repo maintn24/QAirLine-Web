@@ -4,12 +4,16 @@
     font-family: "Monsterat", sans-serif;
     padding: 15px;
     align-items: center;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .title {
     text-align: center;
     margin-bottom: 1.5rem;
     color: var(--foreground);
+    font-weight: bold;
+    font-size: 30px;
 }
 
 
@@ -49,7 +53,7 @@
     text-align: right;
 }
 
-.container button {
+.container .pricebutton {
     background: var(--foreground);
     color: var(--background);
     border: none;

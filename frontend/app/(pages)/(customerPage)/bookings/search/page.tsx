@@ -116,6 +116,7 @@ const FlightBooking: React.FC = () => {
     return (
         <div className={style.container}>
             <h1 className={style.title}>Flight Booking</h1>
+
             <div className={style.searchbar}>
                 <SearchBar search={search} handleInputChange={handleInputChange} handleSearch={handleSearch}/>
             </div>
@@ -142,7 +143,7 @@ const FlightBooking: React.FC = () => {
                             <div><strong>{flight.SeatsAvailable}</strong></div>
                         </div>
                         <div className={style.column}>
-                            <button onClick={() => toPaymentPage(flight)}>Economy<br/>${flight.Price}</button>
+                            <button className={style.pricebutton} onClick={() => toPaymentPage(flight)}>Economy<br/>${flight.Price}</button>
                         </div>
                     </li>
                 ))}

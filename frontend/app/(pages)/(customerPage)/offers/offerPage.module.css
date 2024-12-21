@@ -1,14 +1,18 @@
 
 .container {
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .heading {
     text-align: center;
-    font-size: 2rem;
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem;
+    color: var(--foreground);
+    font-weight: bold;
+    font-size: 30px;
 }
 
 .offerGrid {
