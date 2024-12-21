@@ -10,21 +10,21 @@ function CreateOfferPage() {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const [userID, setUserID] = useState<string | null>(null);
     const router = useRouter();
 
     // Hàm giải mã token và lấy userID
     const getUserIDFromToken = () => {
-        const token = localStorage.getItem("token"); // Lấy token từ localStorage
+        const token = localStorage.getItem("token");
         if (!token) {
-            return null; // Nếu không có token, trả về null
+            return null;
         }
-
         try {
-            const decodedToken = JSON.parse(atob(token.split('.')[1])); // Giải mã payload của JWT
-            return decodedToken?.userid || null; // Trả về userID nếu có
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            return decodedToken?.userid || null;
         } catch (error) {
             console.error("Error decoding token:", error);
-            return null; // Nếu giải mã lỗi, trả về null
+            return null;
         }
     };
 
@@ -37,15 +37,15 @@ function CreateOfferPage() {
             router.push("/admin?loginRequired=true"); // Redirect to /admin if no valid token
             return;
         }
-
+        setUserID(userID); // Set userID in state
         setIsAuthenticated(true);
-        setLoading(false); // Sau khi kiểm tra xong, set loading là false
+        setLoading(false); // After checking the token, stop loading
     }, [router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Reset trạng thái lỗi và thành công
+        // Reset error and success messages
         setError(null);
         setSuccessMessage(null);
 
@@ -68,13 +68,14 @@ function CreateOfferPage() {
                 body: JSON.stringify({
                     title,
                     content: description,
-                    userID: JSON.parse(localStorage.getItem("token") || "{}").userid, // Using token to get userID
+                    userID, // Send the userID directly
                 }),
             });
 
             const data = await response.json();
+
             if (response.ok) {
-                setSuccessMessage(`Offer created successfully`);
+                setSuccessMessage("Offer created successfully");
                 setTitle(""); // Reset title
                 setDescription(""); // Reset description
             } else {
@@ -82,11 +83,12 @@ function CreateOfferPage() {
             }
         } catch (error) {
             setError("An unexpected error occurred. Please try again later.");
+            console.error("Error during offer creation:", error);
         }
     };
 
     if (loading) {
-        return <div>Loading...</div>; // Render loading khi đang kiểm tra token
+        return <div>Loading...</div>;
     }
 
     return (
