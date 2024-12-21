@@ -97,6 +97,7 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
               id="AircraftModel"
               name="AircraftModel"
               value={formData.AircraftModel}
+              placeholder='Enter text here'
               onChange={handleChange}
               required
             />
@@ -108,6 +109,7 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
               id="Departure"
               name="Departure"
               value={formData.Departure}
+              placeholder='Enter text here'
               onChange={handleChange}
               required
             />
@@ -118,6 +120,7 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
               type="text"
               id="Arrival"
               name="Arrival"
+              placeholder='Enter text here'
               value={formData.Arrival}
               onChange={handleChange}
               required
@@ -130,6 +133,7 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
               id="DepartureTime"
               name="DepartureTime"
               value={formData.DepartureTime}
+              placeholder='dd/mm/yyyy hh:mm'
               onChange={handleChange}
               required
             />
@@ -141,6 +145,7 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
               id="ArrivalTime"
               name="ArrivalTime"
               value={formData.ArrivalTime}
+              placeholder='dd/mm/yyyy hh:mm'
               onChange={handleChange}
               required
             />
