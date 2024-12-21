@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import connection from '../database/database';
 import { OkPacket } from 'mysql2'; 
 import { RowDataPacket } from 'mysql2/';
+import moment from 'moment-timezone';
 
  // Kiểm tra UserID có tồn tại và có phải Admin không
  const checkUserIsAdmin = (userID: number, callback: (isAdmin: boolean, error?: any) => void): void => {
@@ -922,130 +923,138 @@ export const updateAircraft = (req: Request, res: Response): void => {
 //10. Sửa chuyến bay
 export const editFlight = (req: Request, res: Response): void => {
   const {
-      userID,
-      flightID,
-      model,
-      departure,
-      arrival,
-      departureTime,
-      arrivalTime,
-      price,
-      seatsAvailable,
-      status
+    userID,
+    flightID,
+    model,
+    departure,
+    arrival,
+    departureTime,
+    arrivalTime,
+    price,
+    seatsAvailable,
+    status,
   } = req.body;
 
-  // Kiểm tra đầu vào
   if (!userID || !flightID || !model) {
-      res.status(400).json({
-          message: 'Missing required fields: userID, flightID, or model',
-      });
-      return;
+    res.status(400).json({
+      message: 'Missing required fields: userID, flightID, or model',
+    });
+    return;
   }
 
-  // Kiểm tra UserID có tồn tại và có phải Admin không
   checkUserIsAdmin(userID, (isAdmin, error) => {
-      if (error) {
-          res.status(500).json({
-              message: 'Error checking user role',
-              error: error.message,
-          });
-          return;
-      }
-
-      if (!isAdmin) {
-          res.status(403).json({
-              message: 'Permission denied: User is not an admin',
-          });
-          return;
-      }
-
-      // Lấy AircraftTypeID từ Model
-      const getAircraftQuery = 'SELECT AircraftID FROM Aircrafts WHERE Model = ?';
-      connection.query(getAircraftQuery, [model], (err, results) => {
-          if (err) {
-              console.error('Error fetching aircraft:', err.stack);
-              res.status(500).json({
-                  message: 'Internal Server Error',
-                  error: err.message,
-              });
-              return;
-          }
-
-          if ((results as RowDataPacket[]).length === 0) {
-              res.status(404).json({
-                  message: 'Aircraft model not found',
-              });
-              return;
-          }
-
-          const aircraftTypeID = (results as RowDataPacket[])[0].AircraftID;
-
-          // Kiểm tra FlightID có tồn tại không
-          const checkFlightQuery = 'SELECT * FROM Flights WHERE FlightID = ?';
-          connection.query(checkFlightQuery, [flightID], (err, results) => {
-              if (err) {
-                  console.error('Error checking flight existence:', err.stack);
-                  res.status(500).json({
-                      message: 'Internal Server Error',
-                      error: err.message,
-                  });
-                  return;
-              }
-
-              if ((results as RowDataPacket[]).length === 0) {
-                  res.status(404).json({
-                      message: 'Flight not found',
-                  });
-                  return;
-              }
-
-              // Thực hiện cập nhật chuyến bay
-              const updateQuery = `
-                  UPDATE Flights 
-                  SET 
-                      AircraftTypeID = ?,
-                      Departure = ?,
-                      Arrival = ?,
-                      DepartureTime = ?,
-                      ArrivalTime = ?,
-                      Price = ?,
-                      SeatsAvailable = ?,
-                      Status = ?
-                  WHERE FlightID = ?
-              `;
-
-              connection.query(
-                  updateQuery,
-                  [
-                      aircraftTypeID,
-                      departure,
-                      arrival,
-                      departureTime,
-                      arrivalTime,
-                      price,
-                      seatsAvailable,
-                      status,
-                      flightID
-                  ],
-                  (err, results) => {
-                      if (err) {
-                          console.error('Error updating flight:', err.stack);
-                          res.status(500).json({
-                              message: 'Failed to update flight',
-                              error: err.message,
-                          });
-                          return;
-                      }
-
-                      const timestamp = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
-                      res.status(200).json({
-                          message: 'Flight updated successfully',
-                          flightID,
-                          timestamp,
-                      });
-                  }
-              );
-          });
+    if (error) {
+      res.status(500).json({
+        message: 'Error checking user role',
+        error: error.message,
       });
+      return;
+    }
+
+    if (!isAdmin) {
+      res.status(403).json({
+        message: 'Permission denied: User is not an admin',
+      });
+      return;
+    }
+
+    const getAircraftQuery = 'SELECT AircraftID FROM Aircrafts WHERE Model = ?';
+    connection.query(getAircraftQuery, [model], (err, results) => {
+      if (err) {
+        console.error('Error fetching aircraft:', err.stack);
+        res.status(500).json({
+          message: 'Internal Server Error',
+          error: err.message,
+        });
+        return;
+      }
+
+      if ((results as RowDataPacket[]).length === 0) {
+        res.status(404).json({
+          message: 'Aircraft model not found',
+        });
+        return;
+      }
+
+      const aircraftTypeID = (results as RowDataPacket[])[0].AircraftID;
+
+      const checkFlightQuery = 'SELECT * FROM Flights WHERE FlightID = ?';
+      connection.query(checkFlightQuery, [flightID], (err, flightResults) => {
+        if (err) {
+          console.error('Error checking flight existence:', err.stack);
+          res.status(500).json({
+            message: 'Internal Server Error',
+            error: err.message,
+          });
+          return;
+        }
+
+        const flights = flightResults as RowDataPacket[];
+
+        if (flights.length === 0) {
+          res.status(404).json({
+            message: 'Flight not found',
+          });
+          return;
+        }
+
+        const flight = flights[0];
+
+        // Nếu không có giá trị mới, sử dụng thời gian cũ từ cơ sở dữ liệu
+        const updatedDepartureTime = departureTime
+          ? moment(departureTime).tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss')
+          : flight.DepartureTime;
+
+        const updatedArrivalTime = arrivalTime
+          ? moment(arrivalTime).tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss')
+          : flight.ArrivalTime;
+
+        const updateQuery = `
+          UPDATE Flights 
+          SET 
+            AircraftTypeID = ?,
+            Departure = ?,
+            Arrival = ?,
+            DepartureTime = ?,
+            ArrivalTime = ?,
+            Price = ?,
+            SeatsAvailable = ?,
+            Status = ?
+          WHERE FlightID = ?
+        `;
+
+        connection.query(
+          updateQuery,
+          [
+            aircraftTypeID,
+            departure || flight.Departure,
+            arrival || flight.Arrival,
+            updatedDepartureTime,
+            updatedArrivalTime,
+            price ?? flight.Price,
+            seatsAvailable ?? flight.SeatsAvailable,
+            status || flight.Status,
+            flightID,
+          ],
+          (err) => {
+            if (err) {
+              console.error('Error updating flight:', err.stack);
+              res.status(500).json({
+                message: 'Failed to update flight',
+                error: err.message,
+              });
+              return;
+            }
+
+            const timestamp = moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss');
+            res.status(200).json({
+              message: 'Flight updated successfully',
+              flightID,
+              timestamp,
+            });
+          }
+        );
+      });
+    });
   });
 };
