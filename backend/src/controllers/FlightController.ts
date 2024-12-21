@@ -169,7 +169,6 @@ export const bookFlight = (req: Request, res: Response): void => {
       return;
     }
 
-    // Ép kiểu userResults thành RowDataPacket[]
     const users = userResults as RowDataPacket[];
     if (users.length === 0) {
       res.status(404).json({ message: 'User not found' });
@@ -208,30 +207,38 @@ export const bookFlight = (req: Request, res: Response): void => {
           return;
         }
 
+        // Lấy thời gian hiện tại theo UTC+7
+        const bookingDate = moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss');
+
         // Logic đặt vé mới
-        const insertQuery = 'INSERT INTO Bookings (UserID, FlightID) VALUES (?, ?)';
-        connection.query(insertQuery, [UserID, FlightID], (err, insertResults) => {
+        const insertQuery = `
+          INSERT INTO Bookings (UserID, FlightID, BookingDate) 
+          VALUES (?, ?, ?)
+        `;
+        connection.query(insertQuery, [UserID, FlightID, bookingDate], (err, insertResults) => {
           if (err) {
             res.status(500).json({ message: 'Failed to create booking', error: err.message });
             return;
           }
-          // Update SeatsAvailable
-              const updateSeatsQuery = 'UPDATE Flights SET SeatsAvailable = SeatsAvailable - 1 WHERE FlightID = ?';
-              connection.query(updateSeatsQuery, [FlightID], (err) => {
-                if (err) {
-                  console.error('Error updating flight seats:', err);
-                  res.status(500).json({ message: 'Failed to update flight seat availability' });
-                  return;
-                }
-              })
 
           const newBookingID = (insertResults as OkPacket).insertId;
 
-          res.status(201).json({
-            message: 'Booking confirmed',
-            bookingID: newBookingID,
-            UserID,
-            FlightID,
+          // Update SeatsAvailable
+          const updateSeatsQuery = 'UPDATE Flights SET SeatsAvailable = SeatsAvailable - 1 WHERE FlightID = ?';
+          connection.query(updateSeatsQuery, [FlightID], (err) => {
+            if (err) {
+              console.error('Error updating flight seats:', err);
+              res.status(500).json({ message: 'Failed to update flight seat availability' });
+              return;
+            }
+
+            res.status(201).json({
+              message: 'Booking confirmed',
+              bookingID: newBookingID,
+              UserID,
+              FlightID,
+              BookingDate: bookingDate,
+            });
           });
         });
       });
