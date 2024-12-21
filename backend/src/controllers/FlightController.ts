@@ -964,41 +964,36 @@ export const editFlight = (req: Request, res: Response): void => {
     res.status(400).json({
       message: 'Missing required fields: userID, flightID, or model',
     });
-    return;
   }
 
   checkUserIsAdmin(userID, (isAdmin, error) => {
     if (error) {
-      res.status(500).json({
+      return res.status(500).json({
         message: 'Error checking user role',
         error: error.message,
       });
-      return;
     }
 
     if (!isAdmin) {
-      res.status(403).json({
+      return res.status(403).json({
         message: 'Permission denied: User is not an admin',
       });
-      return;
     }
 
     const getAircraftQuery = 'SELECT AircraftID FROM Aircrafts WHERE Model = ?';
     connection.query(getAircraftQuery, [model], (err, results) => {
       if (err) {
         console.error('Error fetching aircraft:', err.stack);
-        res.status(500).json({
+        return res.status(500).json({
           message: 'Internal Server Error',
           error: err.message,
         });
-        return;
       }
 
       if ((results as RowDataPacket[]).length === 0) {
-        res.status(404).json({
+        return res.status(404).json({
           message: 'Aircraft model not found',
         });
-        return;
       }
 
       const aircraftTypeID = (results as RowDataPacket[])[0].AircraftID;
@@ -1007,20 +1002,18 @@ export const editFlight = (req: Request, res: Response): void => {
       connection.query(checkFlightQuery, [flightID], (err, flightResults) => {
         if (err) {
           console.error('Error checking flight existence:', err.stack);
-          res.status(500).json({
+          return res.status(500).json({
             message: 'Internal Server Error',
             error: err.message,
           });
-          return;
         }
 
         const flights = flightResults as RowDataPacket[];
 
         if (flights.length === 0) {
-          res.status(404).json({
+          return res.status(404).json({
             message: 'Flight not found',
           });
-          return;
         }
 
         const flight = flights[0];
@@ -1044,7 +1037,7 @@ export const editFlight = (req: Request, res: Response): void => {
             ArrivalTime = ?,
             Price = ?,
             SeatsAvailable = ?,
-            Status = ?
+            Status = ? 
           WHERE FlightID = ?
         `;
 
@@ -1061,47 +1054,55 @@ export const editFlight = (req: Request, res: Response): void => {
             status || flight.Status,
             flightID,
           ],
-          (err) => {
+          async (err) => {
             if (err) {
               console.error('Error updating flight:', err.stack);
-              res.status(500).json({
+              return res.status(500).json({
                 message: 'Failed to update flight',
                 error: err.message,
               });
-              return;
             }
 
             const timestamp = moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD HH:mm:ss');
-            res.status(200).json({
-              message: 'Flight updated successfully',
-              flightID,
-              timestamp,
+            
+            // Gửi email thông báo sau khi cập nhật thành công
+            const getUsersQuery = 'SELECT Email FROM Users WHERE Email IS NOT NULL';
+            connection.query(getUsersQuery, async (err, results) => {
+              if (err) {
+                console.error('Error fetching user emails:', err);
+                return res.status(500).json({ message: 'Failed to fetch user emails' });
+              }
+
+              const emails = (results as any[]).map((user) => user.Email);
+
+              try {
+                await Promise.all(
+                  emails.map((email) =>
+                    sendEmail(
+                      email,
+                      `Flight Update Notification`,
+                      `Hello,\n\nThe flight details have been updated:\n\nFrom: ${departure}\nTo: ${arrival}\nDeparture Time: ${departureTime}\nArrival Time: ${arrivalTime}\n\nBest regards,\nYour Team`
+                    ).catch((error) => {
+                      console.error(`Failed to send email to ${email}:`, error);
+                    })
+                  )
+                );
+
+                // Phản hồi thành công sau khi hoàn tất
+                return res.status(200).json({
+                  message: 'Flight updated successfully and notifications sent',
+                  flightID,
+                  timestamp,
+                });
+              } catch (error) {
+                console.error('Error during email notifications:', error);
+                return res.status(500).json({ message: 'Flight updated but failed to send notifications' });
+              }
             });
           }
         );
       });
     });
   });
-  // Sau khi cập nhật Flight thành công
-  const getUsersQuery = 'SELECT Email FROM Users WHERE Email IS NOT NULL';
-  connection.query(getUsersQuery, (err, results) => {
-    if (err) {
-      console.error('Error fetching user emails:', err);
-      return res.status(500).json({ message: 'Failed to fetch user emails' });
-    }
-
-    const emails = (results as any[]).map((user) => user.Email);
-
-    // Gửi email thông báo
-    emails.forEach((email) => {
-      sendEmail(
-        email,
-        `Flight Update Notification`,
-        `Hello,\n\nThe flight details have been updated:\n\nFrom: ${departure}\nTo: ${arrival}\nDeparture Time: ${departureTime}\nArrival Time: ${arrivalTime}\n\nBest regards,\nYour Team`
-      ).catch((error) => console.error(`Failed to send email to ${email}:`, error));
-    });
-
-    // Phản hồi thành công
-    res.status(200).json({ message: 'Flight updated and notifications sent' });
-  });
 };
+
