@@ -39,6 +39,7 @@ export default function AircraftForm({ aircraft, onClose, onSubmit }: AircraftFo
                             type='text'
                             name='Model'
                             value={formData.Model}
+                            placeholder='Enter text here'
                             onChange={handleChange}
                             className={styles.inputField}
                             required
@@ -50,6 +51,7 @@ export default function AircraftForm({ aircraft, onClose, onSubmit }: AircraftFo
                             type="text"
                             name="Manufacturer"
                             value={formData.Manufacturer}
+                            placeholder='Enter text here'
                             onChange={handleChange}
                             className={styles.inputField}
                             required
