@@ -72,3 +72,19 @@
   padding: 8px 12px;
   cursor: pointer;
 }
+
+/* Thêm kiểu cho dropdown */
+.inputField select {
+  width: 100%;
+  border-radius: 8px;
+  padding: 6px;
+  margin-bottom: 12px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+}
+
+.inputField select:focus {
+  outline: none;
+  border-color: #167db5;
+}
+

@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import styles from './styles/flightForm.module.css';
 import { Flight } from '../flightObject';
 import { parse, format } from 'date-fns';
+import { Aircraft } from '../../aircraft/aircraftObject';
 
 type FlightFormProps = {
-  flight: Flight | null; // Nếu là null, form sẽ dùng để thêm mới
+  flight: Flight | null;
   onClose: () => void;
-  onSubmit: (flight: Partial<Flight>) => void; // Dùng Partial để chấp nhận thiếu FlightID khi thêm mới
+  onSubmit: (flight: Partial<Flight>) => void;
 };
 
 export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProps) {
@@ -22,7 +23,49 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
     Status: flight?.Status || 'Scheduled',
   });
 
-  // Convert date string in dd/mm/yyyy HH:mm format to ISO string
+  const [aircraftList, setAircraftList] = useState<Aircraft[]>([]);
+
+  // Hàm lấy userID từ token trong localStorage
+  const getUserID = () => {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    const decoded = JSON.parse(atob(token.split('.')[1]));
+    return decoded.userid;
+  };
+
+  useEffect(() => {
+    const fetchAircrafts = async () => {
+      try {
+        const userID = getUserID(); // Lấy userID từ token
+        if (!userID) {
+          console.error('UserID không có trong token');
+          return;
+        }
+        const response = await fetch('http://localhost:3001/api/Aircrafts/GetAll', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userID }), // Truyền userID vào API
+        });
+        
+        const data = await response.json();
+
+        console.log(data);
+        
+        // Kiểm tra xem response có chứa "aircrafts"
+        if (data && data.aircrafts && Array.isArray(data.aircrafts)) {
+          setAircraftList(data.aircrafts); // Lưu dữ liệu máy bay vào state
+        } else {
+          console.error('Dữ liệu trả về không đúng định dạng');
+        }
+      } catch (error) {
+        console.error('Error fetching aircraft data:', error);
+      }
+    };
+    fetchAircrafts();
+  }, []); // Chạy khi component mount
+
   const convertToISO = (dateStr: string) => {
     if (!dateStr) return '';
     try {
@@ -34,7 +77,6 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
     }
   };
 
-  // Convert ISO string to dd/mm/yyyy HH:mm format
   const convertToDisplayFormat = (isoDate: string) => {
     if (!isoDate) return '';
     return format(new Date(isoDate), 'dd/MM/yyyy HH:mm');
@@ -56,7 +98,7 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
     }
   }, [flight]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -66,14 +108,13 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Chuyển đổi trước khi gửi
     const formattedData = {
       ...formData,
       DepartureTime: formData.DepartureTime
-        ? convertToISO(formData.DepartureTime) // Convert to ISO format
+        ? convertToISO(formData.DepartureTime)
         : '',
       ArrivalTime: formData.ArrivalTime
-        ? convertToISO(formData.ArrivalTime) // Convert to ISO format
+        ? convertToISO(formData.ArrivalTime)
         : '',
     };
     onSubmit(formattedData);
@@ -92,15 +133,21 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
           )}
           <div className={`${styles.formGroup} ${styles.inputField}`}>
             <label htmlFor="AircraftModel">Aircraft Model</label>
-            <input
-              type="text"
+            <select
               id="AircraftModel"
               name="AircraftModel"
               value={formData.AircraftModel}
-              placeholder='Enter text here'
               onChange={handleChange}
               required
-            />
+            >
+              <option value="">Select a Model</option>
+              {Array.isArray(aircraftList) &&
+                aircraftList.map((aircraft) => (
+                  <option key={aircraft.AircraftID} value={aircraft.Model}>
+                    {aircraft.Model}
+                  </option>
+                ))}
+            </select>
           </div>
           <div className={`${styles.formGroup} ${styles.inputField}`}>
             <label htmlFor="Departure">Departure</label>
@@ -109,7 +156,7 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
               id="Departure"
               name="Departure"
               value={formData.Departure}
-              placeholder='Enter text here'
+              placeholder="Enter text here"
               onChange={handleChange}
               required
             />
@@ -120,7 +167,7 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
               type="text"
               id="Arrival"
               name="Arrival"
-              placeholder='Enter text here'
+              placeholder="Enter text here"
               value={formData.Arrival}
               onChange={handleChange}
               required
@@ -133,7 +180,7 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
               id="DepartureTime"
               name="DepartureTime"
               value={formData.DepartureTime}
-              placeholder='dd/mm/yyyy hh:mm'
+              placeholder="dd/mm/yyyy hh:mm"
               onChange={handleChange}
               required
             />
@@ -145,7 +192,7 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
               id="ArrivalTime"
               name="ArrivalTime"
               value={formData.ArrivalTime}
-              placeholder='dd/mm/yyyy hh:mm'
+              placeholder="dd/mm/yyyy hh:mm"
               onChange={handleChange}
               required
             />
