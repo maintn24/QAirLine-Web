@@ -75,7 +75,7 @@ function CreateOfferPage() {
             const data = await response.json();
 
             if (response.ok) {
-                setSuccessMessage("Offer created successfully");
+                setSuccessMessage("Offer created and send Mail to Cusomter Successfully");
                 setTitle(""); // Reset title
                 setDescription(""); // Reset description
             } else {

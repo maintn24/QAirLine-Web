@@ -4,6 +4,9 @@ import { OkPacket } from 'mysql2';
 import { RowDataPacket } from 'mysql2/';
 import moment from 'moment-timezone';
 import { sendEmail } from './EmailService';
+import { promisify } from 'util';
+
+
  // Kiểm tra UserID có tồn tại và có phải Admin không
  const checkUserIsAdmin = (userID: number, callback: (isAdmin: boolean, error?: any) => void): void => {
   const query = 'SELECT Role FROM Users WHERE UserID = ?';
@@ -362,81 +365,75 @@ export const cancelBooking = (req: Request, res: Response): void => {
   //1. Tạo Offer
   export const CreateOffer = (req: Request, res: Response): void => {
     const { title, content, userID } = req.body;
-
-   // Kiểm tra xem UserID có tồn tại và là admin hay không ?
-   checkUserIsAdmin(userID, (isAdmin, error) => {
-    if (error) {
-      res.status(500).json({
-        message: 'Error checking user role',
-        error: error.message,
-      });
-      return;
-    }
-
-    if (!isAdmin) {
-      res.status(403).json({
-        message: 'Permission denied: User does not exist or is not an admin',
-      });
-      return;
-    }
-    // Kiểm tra đầu vào
-    if (!title || !content || !userID) {
-      res.status(400).json({ message: 'Missing required fields: title, content, or UserID' });
-      return;
-    }
-      // Kiểm tra xem người dùng có phải là admin hay không
-      const adminQuery = 'SELECT Role FROM Users WHERE UserID = ?';
-      connection.query(adminQuery, [userID], (err, results: any) => {
+  
+    // Kiểm tra xem UserID có tồn tại và là admin hay không
+    checkUserIsAdmin(userID, (isAdmin, error) => {
+      if (error) {
+        return res.status(500).json({
+          message: 'Error checking user role',
+          error: error.message,
+        });
+      }
+  
+      if (!isAdmin) {
+        return res.status(403).json({
+          message: 'Permission denied: User does not exist or is not an admin',
+        });
+      }
+  
+      // Kiểm tra đầu vào
+      if (!title || !content || !userID) {
+        return res.status(400).json({ message: 'Missing required fields: title, content, or UserID' });
+      }
+  
+      // Tạo Offer
+      const query = 'INSERT INTO Offers (Title, Content) VALUES (?, ?)';
+      connection.query(query, [title, content], (err) => {
         if (err) {
-          console.error('Error checking user role:', err);
-          res.status(500).json({ message: 'Failed to verify user role' });
-          return;
+          console.error('Error inserting offer:', err);
+          return res.status(500).json({ message: 'Failed to create Offer' });
         }
-        // Kiểm tra kết quả trả về có hợp lệ không và người dùng có Role là Admin
-        if (!Array.isArray(results) || results.length === 0 || results[0].Role !== 'Admin') {
-          res.status(403).json({ message: 'Permission denied: User is not an admin' });
-          return;
-        }
-        // Thực hiện tạo Offer nếu người dùng là admin
-        const query = 'INSERT INTO Offers (Title, Content) VALUES (?, ?)';
-        connection.query(query, [title, content], (err, results: any) => {
+  
+        // Lấy danh sách email
+        const getUsersQuery = 'SELECT Email FROM Users WHERE Email IS NOT NULL';
+        connection.query(getUsersQuery, async (err, results) => {
           if (err) {
-            console.error('Error inserting offer:', err);
-            res.status(500).json({ message: 'Failed to create Offer' });
-            return;
+            console.error('Error fetching user emails:', err);
+            return res.status(500).json({ message: 'Failed to fetch user emails' });
           }
-
-          const timestamp = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
-          res.status(201).json({
-            message: 'Offer created successfully',
-            timestamp
-          });
+  
+          const emails = (results as any[]).map((user) => user.Email);
+  
+          try {
+            // Gửi email bằng Promise.all để chờ tất cả hoàn thành
+            await Promise.all(
+              emails.map((email) =>
+                sendEmail(
+                  email,
+                  `New Offer: ${title}`,
+                  `Hello,\n\nWe have a new offer for you:\n\n${content}\n\nBest regards,\nYour Team`
+                ).catch((error) => {
+                  console.error(`Failed to send email to ${email}:`, error);
+                })
+              )
+            );
+  
+            // Phản hồi sau khi hoàn thành
+            const timestamp = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+            res.status(201).json({
+              message: 'Offer created successfully and notifications sent',
+              timestamp,
+            });
+          } catch (error) {
+            console.error('Error during email notifications:', error);
+            res.status(500).json({ message: 'Offer created but failed to send notifications' });
+          }
         });
       });
     });
-    // Sau khi lưu Offer thành công
-      const getUsersQuery = 'SELECT Email FROM Users WHERE Email IS NOT NULL';
-      connection.query(getUsersQuery, (err, results) => {
-      if (err) {
-        console.error('Error fetching user emails:', err);
-        return res.status(500).json({ message: 'Failed to fetch user emails' });
-      }
-
-      const emails = (results as any[]).map((user) => user.Email);
-
-      // Gửi email thông báo
-      emails.forEach((email) => {
-        sendEmail(
-          email,
-          `New Offer: ${title}`,
-          `Hello,\n\nWe have a new offer for you:\n\n${content}\n\nBest regards,\nYour Team`
-        ).catch((error) => console.error(`Failed to send email to ${email}:`, error));
-      });
-
-      // Phản hồi thành công
-      res.status(201).json({ message: 'Offer posted and notifications sent' });
-    });
   };
+  
+  
 
 //2. Thêm tàu bay 
 export const addAircraft = (req: Request, res: Response): void => {

@@ -1,13 +1,13 @@
 import nodemailer from 'nodemailer';
+
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // Hoặc SMTP khác
+  service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER, // Email của bạn (đặt trong .env)
-    pass: process.env.EMAIL_PASS, // Mật khẩu email (đặt trong .env)
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
-// Hàm gửi email
 export const sendEmail = async (to: string, subject: string, text: string) => {
   try {
     await transporter.sendMail({
@@ -19,6 +19,6 @@ export const sendEmail = async (to: string, subject: string, text: string) => {
     console.log(`Email sent to ${to}`);
   } catch (error) {
     console.error(`Error sending email to ${to}:`, error);
-    throw error;
+    throw error; // Ném lỗi để xử lý sau
   }
 };
