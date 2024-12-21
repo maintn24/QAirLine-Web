@@ -79,8 +79,7 @@
 
 .signOutButton {
 	background-color: var(--background); /* Nền trắng */
-	border: 2px solid red;   /* Viền đỏ */
-	color: black;            /* Chữ đen */
+	color: var(--foreground);            /* Chữ đen */
 	padding: 8px 16px;       /* Khoảng cách padding */
 	border-radius: 4px;      /* Góc bo tròn */
 	cursor: pointer;         /* Hiển thị con trỏ pointer */
@@ -88,7 +87,7 @@
   }
   
   .signOutButton:hover {
-	background-color: red !important;   /* Nền đỏ khi hover */
+	background-color: #333333; /* Nền đen khi hover */
 	color: white;            /* Chữ trắng khi hover */
   }
 

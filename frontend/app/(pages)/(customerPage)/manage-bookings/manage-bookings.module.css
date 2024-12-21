@@ -1,8 +1,8 @@
 .container {
     margin: auto;
-    max-width: 1000px;
     font-family: "Monsterat", sans-serif;
-    padding: 15px;
+    max-width: 1200px;
+    padding: 20px 100px 50px;
     align-items: center;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

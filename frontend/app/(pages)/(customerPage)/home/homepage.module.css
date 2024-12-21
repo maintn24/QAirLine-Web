@@ -2,6 +2,7 @@
   position: relative;
   width: 100%;
   height: auto;
+  padding-bottom: 20px;
 
 }
 
@@ -35,6 +36,16 @@
   .welcome img {
     width: 30vw; /* Adjust image size for smaller screens */
   }
+}
+.title {
+  text-align: center;
+  color: var(--foreground);
+  font-weight: bold;
+  font-size: 25px;
+}
+
+.content {
+  padding-bottom: 10px;
 }
 
 .hotDes{
