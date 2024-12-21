@@ -85,6 +85,7 @@ export default function AircraftForm({ aircraft, onClose, onSubmit }: AircraftFo
                             name="Description"
                             value={formData.Description}
                             onChange={handleChange}
+                            placeholder='Enter text here'
                             className={styles.inputField}
                             required
                         />
