@@ -18,7 +18,7 @@ const Header = () => {
             <div className={styles.logoContainer}>
                 <Link href="/admin/home">
                     <img 
-                        src="/Logo/LogoS.png"
+                        src="/Logo/logo.svg"
                         alt="Cloud Airlines Logo"
                         className={styles.logo}
                         // onClick={handleOptionClick}

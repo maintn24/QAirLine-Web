@@ -87,15 +87,17 @@ export default function Home() {
 
   return (
       <main>
-          <div className={style.welcome}>
-              Welcome to Cloud Airlines! {role} {name}
-          </div>
+
           <div className={style.main_image}>
-              <img src="Placeholder/image_mainpage.png" alt="Main image"></img>
+              <img className={style.placeholder} src={'Placeholder/plane2.jpg'} alt="Main image"></img>
+              <div className={style.welcome}>
+                  Welcome to
+                  <img src={`/Logo/big_logo.svg`} alt="Big Logo"/>
+              </div>
           </div>
 
-          <div className="searchBar">
-              <h1 className="text-center font-bold mb-4 text-lg">----------Book Flights----------</h1>
+          <div className={style.content}>
+              <h1 className={style.title}>Book Flights</h1>
               <SearchBar
                   search={search}
                   handleInputChange={handleInputChange}
@@ -104,31 +106,34 @@ export default function Home() {
               />
           </div>
 
-          <div className={style.offers}>
-            <h1 className="text-center font-bold mb-4 text-lg">----------Offers----------</h1>
-            <div className={style.offerGrid}>
-            {loading ? (
-                <p>Loading offers...</p>
-            ) : error ? (
-                <p>{error}</p>
-            ) : (
-                offers.slice(0, 3).map((offer) => (
-                <div key={offer.id} className={style.offerCard}>
-                    <img src="./Offer_Image/Offer_Noti.png" alt={offer.title} className={style.offerImage} />
-                    <div className={style.offerTitle}>{offer.title}</div>
-                </div>
-                ))
-            )}
-            </div>
-            <div className="text-center mt-4">
-            <button className="viewMoreButton">
-                Xem thêm <span>&#8594;</span>
-            </button>
-            </div>
-        </div>
+          <div className={style.content}>
+              <div className={style.offers}>
+                  <h1 className={style.title}>Offers</h1>
+                  <div className={style.offerGrid}>
+                      {loading ? (
+                          <p>Loading offers...</p>
+                      ) : error ? (
+                          <p>{error}</p>
+                      ) : (
+                          offers.slice(0, 3).map((offer) => (
+                              <div key={offer.id} className={style.offerCard}>
+                                  <img src={'/Offer_Image/news.svg'} alt={offer.title} className={style.offerImage}/>
+                                  <div className={style.offerTitle}>{offer.title}</div>
+                              </div>
+                          ))
+                      )}
+                  </div>
+                  <div className="text-center mt-4">
+                      <button className="viewMoreButton">
+                          Xem thêm <span>&#8594;</span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+
 
           <div className={style.hotDes}>
-              <h1 className="text-center font-bold mb-4 text-lg">----------Hot Destination----------</h1>
+              <h1 className={style.title}>Hot Destination</h1>
               <div className={style.destinations}>
                   <div className={style.destinationCard}>
                       <img src="Placeholder/HaLongBay.png" alt="Halong Bay, Vietnam"/>

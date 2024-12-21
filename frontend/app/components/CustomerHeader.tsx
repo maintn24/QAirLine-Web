@@ -7,6 +7,8 @@ import AuthenticationPopUp from "@/app/components/AuthenticationPopUp";
 export default function Header() {
   const [isVisible, setIsVisible] = useState(false);
   const [userID, setUserID] = useState<string | null>(null);
+  const [name, setName] = useState<string | null>(null);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
 
   const router = useRouter();
   const currentRoute = usePathname();
@@ -15,6 +17,8 @@ export default function Header() {
   useEffect(() => {
     const storedUserID = localStorage.getItem("userid");
     setUserID(storedUserID);
+    const storedName = localStorage.getItem("name");
+    setName(storedName);
   }, []);
 
   // Hàm xử lý khi nhấn nút Login
@@ -26,7 +30,12 @@ export default function Header() {
   const handleSignOut = () => {
     localStorage.clear();
     setUserID(null); // Cập nhật state userID
+    setName(null); // Cập nhật state username
     router.push(`/`); // Chuyển hướng về trang Home
+  };
+
+  const toggleDropdown = () => {
+    setDropdownVisible(!dropdownVisible);
   };
 
   const toHomePage = () => router.push(`/home`);
@@ -45,7 +54,7 @@ export default function Header() {
     <header className={style.header}>
       <div className={style.wrapper}>
         <div className={style.logo}>
-          <img src={`/Logo/LogoS.png`} style={{ cursor: 'pointer' }} alt="Cloud Airlines Logo"
+          <img src={`/Logo/mini_logo.svg`} style={{ cursor: 'pointer' }} alt="Cloud Airlines Logo"
             onClick={toHomePage} />
         </div>
         <div className={style.container}>
@@ -64,11 +73,20 @@ export default function Header() {
               {userID === null || userID === "null" ? (
                 <li onClick={handleLoginClick}>Login | Register</li>
               ) : (
-                <li onClick={handleSignOut} className={style.signOutButton}>Sign Out</li>
+                  // <li onClick={handleSignOut} className={style.signOutButton}>Sign Out</li>
+                  <li className={style.accountButton} onClick={toggleDropdown}>
+                    Account
+                    {dropdownVisible && (
+                        <ul className={style.dropdownMenu}>
+                          <li>Name: {name}</li>
+                          <li className={style.signOutButton} onClick={handleSignOut}>Logout</li>
+                        </ul>
+                    )}
+                  </li>
               )}
             </ul>
           </nav>
-          <AuthenticationPopUp visible={isVisible} setVisible={setIsVisible} />
+          <AuthenticationPopUp visible={isVisible} setVisible={setIsVisible}/>
         </div>
       </div>
     </header>

@@ -75,13 +75,12 @@ const FlightBooking: React.FC = () => {
     const [filteredFlights, setFilteredFlights] = useState<Flight[]>(flights);
 
     const handleSearch = () => {
-        // Trigger the search
         const filtered = flights.filter(
             (flight) =>
                 (!search.startDestination || flight.Departure.toLowerCase().includes(search.startDestination.toLowerCase())) &&
                 (!search.arriveDestination || flight.Arrival.toLowerCase().includes(search.arriveDestination.toLowerCase())) &&
-                (!search.startDate || flight.DepartureTime.includes(search.startDate)) &&
-                (!search.arriveDate || flight.ArrivalTime.includes(search.arriveDate))
+                (!search.startDate || (flight.DepartureTime && flight.DepartureTime.includes(search.startDate))) &&
+                (!search.arriveDate || (flight.ArrivalTime && flight.ArrivalTime.includes(search.arriveDate)))
         );
         setFilteredFlights(filtered);
     };
@@ -117,8 +116,11 @@ const FlightBooking: React.FC = () => {
     return (
         <div className={style.container}>
             <h1 className={style.title}>Flight Booking</h1>
-            <SearchBar search={search} handleInputChange={handleInputChange} handleSearch={handleSearch}
-            />
+
+            <div className={style.searchbar}>
+                <SearchBar search={search} handleInputChange={handleInputChange} handleSearch={handleSearch}/>
+            </div>
+
             <ul className={style.flightlist}>
                 {filteredFlights.map((flight) => (
                     <li key={flight.FlightID} className={style.flightitem}>
@@ -141,7 +143,7 @@ const FlightBooking: React.FC = () => {
                             <div><strong>{flight.SeatsAvailable}</strong></div>
                         </div>
                         <div className={style.column}>
-                            <button onClick={() => toPaymentPage(flight)}>Economy<br />${flight.Price}</button>
+                            <button className={style.pricebutton} onClick={() => toPaymentPage(flight)}>Economy<br/>${flight.Price}</button>
                         </div>
                     </li>
                 ))}
