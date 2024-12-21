@@ -101,7 +101,6 @@ const ManageBookings = () => {
         cancelBooking(id);
     }
 
-    // Tính thời gian bay
     const calculateFlightDuration = (departureTime: string, arrivalTime: string) => {
         const departure = new Date(departureTime);
         const arrival = new Date(arrivalTime);
@@ -111,7 +110,6 @@ const ManageBookings = () => {
         return `${durationHours}h ${durationMinutes}m`;
     };
 
-    // Định dạng lại datetime
     const formatedDate = (datetime: string) => {
         return format(new Date(datetime), 'HH:mm dd/MM/yyyy');
     };
@@ -134,12 +132,12 @@ const ManageBookings = () => {
                 <ul className={style.ticketlist}>
                     {ticketList
                         .filter(ticket => showCancelled || ticket.BookingStatus !== 'cancelled')
+                        .sort((a, b) => new Date(b.BookingDate).getTime() - new Date(a.BookingDate).getTime())
                         .map((ticket) => (
                             <li key={ticket.BookingID} className={style.ticketitem}>
                                 <div className={style.column}>
                                     <div><strong>Booking ID: {ticket.BookingID}</strong></div>
                                     <div className={style.smalltext}>Booked at: {formatedDate(ticket.BookingDate)}</div>
-
                                 </div>
                                 <div className={style.column}>
                                     <strong>{ticket.Departure}</strong> → <strong>{ticket.Arrival}</strong>
@@ -147,8 +145,7 @@ const ManageBookings = () => {
                                         {formatedDate(ticket.DepartureTime)} → {formatedDate(ticket.ArrivalTime)}
                                     </div>
                                     <div className={style.smalltext}>
-                                        Flight
-                                        duration: {calculateFlightDuration(ticket.DepartureTime, ticket.ArrivalTime)}
+                                        Flight duration: {calculateFlightDuration(ticket.DepartureTime, ticket.ArrivalTime)}
                                     </div>
                                     <div className={style.smalltext}>
                                         Plane: {ticket.AircraftModel}
@@ -163,23 +160,24 @@ const ManageBookings = () => {
                                         Price: ${ticket.Price}
                                     </div>
                                 </div>
-                                <div className={style.column}>
-                                    <div>
-                                        <button className={style.checkinbutton}
-                                                onClick={() => executeCheckin(ticket.BookingID, ticket.FlightStatus)}>Check-in
-                                        </button>
+                                {ticket.BookingStatus !== 'cancelled' && (
+                                    <div className={style.column}>
+                                        <div>
+                                            <button className={style.checkinbutton}
+                                                    onClick={() => executeCheckin(ticket.BookingID, ticket.FlightStatus)}>Check-in
+                                            </button>
+                                        </div>
+                                        <div>
+                                            <button className={style.cancelbutton}
+                                                    onClick={() => executeCancel(ticket.BookingID)}>Cancel
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <button className={style.cancelbutton}
-                                                onClick={() => executeCancel(ticket.BookingID)}>Cancel
-                                        </button>
-                                    </div>
-                                </div>
+                                )}
                             </li>
                         ))}
                 </ul>
             )}
-
         </div>
     )
 }

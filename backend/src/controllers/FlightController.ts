@@ -155,82 +155,66 @@ export const getAllFlights = (req: Request, res: Response) => {
 export const bookFlight = (req: Request, res: Response): void => {
   const { UserID, FlightID } = req.body;
 
-  // Kiểm tra đầu vào
   if (!UserID || !FlightID) {
-    res.status(400).json({ message: 'Missing required fields: UserID or FlightID' });
+    res.status(400).json({ message: 'Missing required fields: userID or flightID' });
     return;
   }
 
-  // Kiểm tra UserID có tồn tại
-  checkUserExists(UserID, (isAdmin, error) => {
-    if (error) {
-      res.status(500).json({ message: 'Error checking user existence', error: error.message });
+  // Kiểm tra userID
+  const userQuery = 'SELECT * FROM Users WHERE UserID = ?';
+  connection.query(userQuery, [UserID], (err, userResults) => {
+    if (err) {
+      res.status(500).json({ message: 'Internal server error', error: err.message });
       return;
     }
 
-    if (!isAdmin) {
-      res.status(404).json({ message: 'User not found or is not an admin' });
+    // Ép kiểu userResults thành RowDataPacket[]
+    const users = userResults as RowDataPacket[];
+    if (users.length === 0) {
+      res.status(404).json({ message: 'User not found' });
       return;
     }
 
-    // Kiểm tra FlightID có tồn tại
-    checkFlightExists(FlightID, (exists, error) => {
-      if (error) {
-        res.status(500).json({ message: 'Error checking flight existence', error: error.message });
+    // Kiểm tra flightID
+    const flightQuery = 'SELECT * FROM Flights WHERE FlightID = ?';
+    connection.query(flightQuery, [FlightID], (err, flightResults) => {
+      if (err) {
+        res.status(500).json({ message: 'Internal server error', error: err.message });
         return;
       }
 
-      if (!exists) {
+      const flights = flightResults as RowDataPacket[];
+      if (flights.length === 0) {
         res.status(404).json({ message: 'Flight not found' });
         return;
       }
 
-      // Lấy thông tin chuyến bay
-      const flightQuery = 'SELECT * FROM Flights WHERE FlightID = ?';
-      connection.query(flightQuery, [FlightID], (err, results) => {
+      // Kiểm tra booking
+      const bookingQuery = `
+        SELECT * FROM Bookings 
+        WHERE UserID = ? AND FlightID = ?
+      `;
+      connection.query(bookingQuery, [UserID, FlightID], (err, bookingResults) => {
         if (err) {
-          console.error('Error querying flights:', err);
-          res.status(500).json({ message: 'Internal server error' });
+          res.status(500).json({ message: 'Internal server error', error: err.message });
           return;
         }
 
-        const flight = (results as RowDataPacket[])[0];
+        const bookings = bookingResults as RowDataPacket[];
 
-        // Kiểm tra SeatsAvailable
-        if (flight.SeatsAvailable <= 0) {
-          res.status(400).json({ message: 'No seats available for this flight' });
+        if (bookings.length > 0 && bookings[0].BookingStatus === 'confirmed') {
+          res.status(400).json({ message: 'You already have a confirmed booking for this flight' });
           return;
         }
 
-        // Kiểm tra booking của user
-        const checkBookingQuery = 'SELECT * FROM Bookings WHERE UserID = ? AND FlightID = ?';
-        connection.query(checkBookingQuery, [UserID, FlightID], (err, results) => {
+        // Logic đặt vé mới
+        const insertQuery = 'INSERT INTO Bookings (UserID, FlightID) VALUES (?, ?)';
+        connection.query(insertQuery, [UserID, FlightID], (err, insertResults) => {
           if (err) {
-            console.error('Error checking existing booking:', err);
-            res.status(500).json({ message: 'Internal server error' });
+            res.status(500).json({ message: 'Failed to create booking', error: err.message });
             return;
           }
-
-          const bookingResults = results as RowDataPacket[];
-
-          // Nếu đã đặt vé và trạng thái là "confirmed"
-          if (bookingResults.length > 0 && bookingResults[0].BookingStatus === 'confirmed') {
-            res.status(400).json({ message: 'User has already confirmed booking for this flight' });
-            return;
-          }
-
-          // Nếu vé đã bị hủy --> update trạng thái thành "confirmed"
-          if (bookingResults.length > 0 && bookingResults[0].BookingStatus === 'cancelled') {
-            const bookingID = bookingResults[0].BookingID;
-            const updateBookingQuery = 'UPDATE Bookings SET BookingStatus = "confirmed", BookingDate = NOW() WHERE BookingID = ?';
-            connection.query(updateBookingQuery, [bookingID], (err) => {
-              if (err) {
-                console.error('Error updating booking status:', err);
-                res.status(500).json({ message: 'Failed to update booking status' });
-                return;
-              }
-
-              // Update SeatsAvailable
+          // Update SeatsAvailable
               const updateSeatsQuery = 'UPDATE Flights SET SeatsAvailable = SeatsAvailable - 1 WHERE FlightID = ?';
               connection.query(updateSeatsQuery, [FlightID], (err) => {
                 if (err) {
@@ -238,49 +222,16 @@ export const bookFlight = (req: Request, res: Response): void => {
                   res.status(500).json({ message: 'Failed to update flight seat availability' });
                   return;
                 }
+              })
 
-                const timestamp = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
-                res.status(201).json({
-                  message: 'Booking re-confirmed successfully, flight re-booked',
-                  bookingID,
-                  FlightID,
-                  UserID,
-                  timestamp,
-                });
-              });
-            });
-          } else {
-            // Nếu chưa hủy vé trước đó, cho phép đặt vé mới
-            const bookingQuery = 'INSERT INTO Bookings (UserID, FlightID) VALUES (?, ?)';
-            connection.query(bookingQuery, [UserID, FlightID], (err, results) => {
-              if (err) {
-                console.error('Error creating booking:', err);
-                res.status(500).json({ message: 'Failed to create booking' });
-                return;
-              }
+          const newBookingID = (insertResults as OkPacket).insertId;
 
-              const bookingID = (results as OkPacket).insertId;
-
-              // Update SeatsAvailable
-              const updateFlightQuery = 'UPDATE Flights SET SeatsAvailable = SeatsAvailable - 1 WHERE FlightID = ?';
-              connection.query(updateFlightQuery, [FlightID], (err) => {
-                if (err) {
-                  console.error('Error updating flight seats:', err);
-                  res.status(500).json({ message: 'Failed to update flight seat availability' });
-                  return;
-                }
-
-                const timestamp = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
-                res.status(201).json({
-                  message: 'Booking confirmed',
-                  bookingID,
-                  FlightID,
-                  UserID,
-                  timestamp,
-                });
-              });
-            });
-          }
+          res.status(201).json({
+            message: 'Booking confirmed',
+            bookingID: newBookingID,
+            UserID,
+            FlightID,
+          });
         });
       });
     });
@@ -292,106 +243,64 @@ export const bookFlight = (req: Request, res: Response): void => {
 export const cancelBooking = (req: Request, res: Response): void => {
   const { userID, bookingID } = req.body;
 
-  // Kiểm tra đầu vào
   if (!userID || !bookingID) {
     res.status(400).json({ message: 'Missing required fields: userID or bookingID' });
     return;
   }
 
-  // Kiểm tra userID có tồn tại 
-  checkUserExists(userID, (isAdmin, error) => {
-    if (error) {
-      res.status(500).json({ message: 'Error checking user existence', error: error.message });
+  // Kiểm tra bookingID có tồn tại và thuộc về userID
+  const bookingQuery = `
+    SELECT b.BookingID, b.FlightID, b.BookingStatus 
+    FROM Bookings b 
+    WHERE b.BookingID = ? AND b.UserID = ?
+  `;
+  connection.query(bookingQuery, [bookingID, userID], (err, bookingResults) => {
+    if (err) {
+      console.error('Error querying booking:', err);
+      res.status(500).json({ message: 'Internal server error', error: err.message });
       return;
     }
 
-    if (!isAdmin) {
-      res.status(404).json({ message: 'User not found ' });
+    const bookings = bookingResults as RowDataPacket[];
+
+    if (bookings.length === 0) {
+      res.status(404).json({ message: 'Booking not found or does not belong to user' });
       return;
     }
 
-    // Kiểm tra bookingID và userID có tồn tại trong booking không
-    const bookingQuery = 'SELECT * FROM Bookings WHERE BookingID = ? AND UserID = ?';
-    connection.query(bookingQuery, [bookingID, userID], (err, results) => {
+    const booking = bookings[0];
+
+    // Nếu vé đã bị hủy
+    if (booking.BookingStatus === 'cancelled') {
+      res.status(400).json({ message: 'Booking is already cancelled' });
+      return;
+    }
+
+    // Cập nhật trạng thái Booking thành "cancelled"
+    const cancelQuery = 'UPDATE Bookings SET BookingStatus = "cancelled" WHERE BookingID = ?';
+    connection.query(cancelQuery, [bookingID], (err) => {
       if (err) {
-        console.error('Error querying booking:', err);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error('Error cancelling booking:', err);
+        res.status(500).json({ message: 'Failed to cancel booking', error: err.message });
         return;
       }
 
-      const bookingResults = results as RowDataPacket[];
-      if (bookingResults.length === 0) {
-        res.status(404).json({ message: 'Booking not found or does not belong to user' });
-        return;
-      }
-
-      const booking = bookingResults[0];
-      const flightID = booking.FlightID;
-
-      // Kiểm tra flightID có tồn tại không
-      checkFlightExists(flightID, (exists, error) => {
-        if (error) {
-          res.status(500).json({ message: 'Error checking flight existence', error: error.message });
+      // Tăng số ghế trống trong bảng Flights
+      const updateSeatsQuery = 'UPDATE Flights SET SeatsAvailable = SeatsAvailable + 1 WHERE FlightID = ?';
+      connection.query(updateSeatsQuery, [booking.FlightID], (err) => {
+        if (err) {
+          console.error('Error updating seats available:', err);
+          res.status(500).json({ message: 'Failed to update seat availability' });
           return;
         }
 
-        if (!exists) {
-          res.status(404).json({ message: 'Flight not found' });
-          return;
-        }
-
-        // Kiểm tra xem đã tồn tại bản ghi hủy vé hay chưa
-        const checkExistingCancellationQuery = `
-          SELECT * FROM Bookings 
-          WHERE UserID = ? AND FlightID = ? AND BookingStatus = 'cancelled'
-        `;
-        connection.query(checkExistingCancellationQuery, [userID, flightID], (err, results) => {
-          if (err) {
-            console.error('Error checking existing cancellation:', err);
-            res.status(500).json({ message: 'Failed to check existing cancellations' });
-            return;
-          }
-
-          if ((results as RowDataPacket[]).length > 0) {
-            res.status(400).json({ message: 'Booking has already been cancelled for this flight and user' });
-            return;
-          }
-
-          // Tạo bản ghi mới với BookingID mới
-          const insertNewBookingQuery = `
-            INSERT INTO Bookings (UserID, FlightID, BookingStatus, PaymentStatus, BookingDate) 
-            VALUES (?, ?, 'cancelled', 'unpaid', NOW())
-          `;
-          connection.query(insertNewBookingQuery, [userID, flightID], (err, results) => {
-            if (err) {
-              console.error('Error creating new booking:', err);
-              res.status(500).json({ message: 'Failed to create new booking record' });
-              return;
-            }
-
-            // Update SeatsAvailable
-            const updateSeatsQuery = 'UPDATE Flights SET SeatsAvailable = SeatsAvailable + 1 WHERE FlightID = ?';
-            connection.query(updateSeatsQuery, [flightID], (err, results) => {
-              if (err) {
-                console.error('Error updating seats available:', err);
-                res.status(500).json({ message: 'Failed to update seat availability' });
-                return;
-              }
-
-              const timestamp = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
-
-              // Trả về thông báo thành công
-              res.status(200).json({ 
-                message: 'Booking cancelled successfully with a new record',
-                timestamp
-              });
-            });
-          });
-        });
+        res.status(200).json({ message: 'Booking cancelled successfully and seat availability updated', bookingID });
       });
     });
   });
 };
+
+
   //4. Theo dõi thông tin chuyến bay đã đặt 
   export const getUserFlights = (req: Request, res: Response): void => {
     const { userID } = req.body;

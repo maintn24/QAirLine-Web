@@ -132,12 +132,12 @@ const AuthenticationPopUp: React.FC<LoginPopupProps> = ({ visible, setVisible })
                 <div className={styles.signUp}>
                     <form onSubmit={handleSignUp} className={styles.form}>
                         <h1 className={styles.formTitle}>Create Account</h1>
-                        <div className={styles.socialContainer}>
-                            <a href="#" className={styles.social}><i className="fab fa_facebook"></i></a>
-                            <a href="#" className={styles.social}><i className="fab fa-google-plus-g"></i></a>
-                            <a href="#" className={styles.social}><i className="fab fa_linkedin_in"></i></a>
-                        </div>
-                        <p className={styles.formText}>or use your email for registration</p>
+                        {/*<div className={styles.socialContainer}>*/}
+                        {/*    <a href="#" className={styles.social}><i className="fab fa_facebook"></i></a>*/}
+                        {/*    <a href="#" className={styles.social}><i className="fab fa-google-plus-g"></i></a>*/}
+                        {/*    <a href="#" className={styles.social}><i className="fab fa_linkedin_in"></i></a>*/}
+                        {/*</div>*/}
+                        {/*<p className={styles.formText}>or use your email for registration</p>*/}
                         <input className={styles.inputField} type="text" name="name" placeholder="Name" required
                                value={signUpData.name} onChange={(e) => setSignUpData({ ...signUpData, name: e.target.value })} />
                         <input className={styles.inputField} type="text" name="username" placeholder="Username" required
@@ -151,7 +151,7 @@ const AuthenticationPopUp: React.FC<LoginPopupProps> = ({ visible, setVisible })
                 </div>
                 <div className={styles.signIn}>
                     <form onSubmit={handleSignIn} className={styles.form}>
-                        <h1 className={styles.formTitle}>Sign in</h1>
+                        <h1 className={styles.formTitle}>Sign In</h1>
 
                         {/*<div className={styles.socialContainer}>*/}
                         {/*    <a href="#" className={styles.social}><i className="fab fa_facebook"></i></a>*/}
@@ -174,13 +174,15 @@ const AuthenticationPopUp: React.FC<LoginPopupProps> = ({ visible, setVisible })
                 <div className={styles.overlayContainer}>
                     <div className={styles.overlay}>
                         <div className={styles.overlayLeft}>
-                            <h1>Welcome Back!</h1>
-                            <p className={styles.overlayText}>To keep connected with us please login with your personal info</p>
+                            <h1>Hi! Welcome to Cloud Airlines!</h1>
+                            <p className={styles.overlayText}>To start booking and keep track of your flights please register with your personal info</p>
+                            <p className={styles.overlayText}>Have an account already?</p>
                             <button className={styles.overlayButton} onClick={handleSignInClick}>Sign In</button>
                         </div>
                         <div className={styles.overlayRight}>
-                            <h1>Hello, Friend</h1>
-                            <p className={styles.overlayText}>Enter your personal details and start journey with us</p>
+                            <h1>Welcome back!</h1>
+                            <p className={styles.overlayText}>Nice to see you again. Enjoy your flights!</p>
+                            <p className={styles.overlayText}>Oh. Don't have an account?</p>
                             <button className={styles.overlayButton} onClick={handleSignUpClick}>Sign Up</button>
                         </div>
                     </div>

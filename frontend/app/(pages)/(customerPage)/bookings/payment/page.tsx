@@ -54,7 +54,7 @@ const PaymentPage = () => {
             const data = await response.json();
 
             if (response.ok) {
-                alert('Purchase successful!' + data.bookingID);
+                alert('Purchase successful! Your booking number is ' + data.bookingID);
                 console.log(data);
                 router.push('/manage-bookings');
             } else {

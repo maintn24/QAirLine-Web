@@ -5,6 +5,7 @@
 :root {
   --background: #F5F5F5;
   --foreground: #155B80;
+  --warning: #500d10
 }
 
 @media (prefers-color-scheme: no-preference ) {

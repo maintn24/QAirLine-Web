@@ -95,8 +95,8 @@
 	z-index: 1000;
 
 	.signOutButton:hover {
-		background-color: #dc3545; /* Nền đỏ khi hover */
-		color: white;            /* Chữ trắng khi hover */
+		background-color: var(--warning); /* Nền đỏ khi hover */
+		color: var(--background);            /* Chữ trắng khi hover */
 	}
 }
 
@@ -114,19 +114,21 @@
 
 /* Mobile responsiveness */
 @media (max-width: 800px) {
-	.logo img {
-		height: auto;
-		width: auto;
-		margin-left: 0;
+	.container {
+		padding: 10px;
 	}
 
 	.navList {
-		gap: 5px;
+		align-items: flex-start;
 	}
 
 	.navList li {
 		padding: 0.5rem;
+		width: 100%;
+		text-align: left;
+	}
+
+	.logo img {
+		height: 40px;
 	}
 }
-
-
