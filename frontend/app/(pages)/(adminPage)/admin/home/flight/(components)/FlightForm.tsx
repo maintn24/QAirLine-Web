@@ -22,21 +22,22 @@ export default function FlightForm({ flight, onClose, onSubmit }: FlightFormProp
     Status: flight?.Status || 'Scheduled',
   });
 
-  // Convert date string in dd/mm/yyyy format to ISO string
+  // Convert date string in dd/mm/yyyy HH:mm format to ISO string
   const convertToISO = (dateStr: string) => {
     if (!dateStr) return '';
     try {
-      const parsedDate = parse(dateStr, 'dd/MM/yyyy', new Date());
+      const parsedDate = parse(dateStr, 'dd/MM/yyyy HH:mm', new Date());
       return parsedDate ? parsedDate.toISOString() : '';
     } catch (error) {
+      console.error('Error parsing date:', error);
       return '';
     }
   };
 
-  // Convert ISO string to dd/mm/yyyy format
+  // Convert ISO string to dd/mm/yyyy HH:mm format
   const convertToDisplayFormat = (isoDate: string) => {
     if (!isoDate) return '';
-    return format(new Date(isoDate), 'dd/MM/yyyy');
+    return format(new Date(isoDate), 'dd/MM/yyyy HH:mm');
   };
 
   useEffect(() => {
